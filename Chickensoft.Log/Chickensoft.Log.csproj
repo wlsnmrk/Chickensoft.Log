@@ -15,7 +15,7 @@
     <Title>Chickensoft.Log</Title>
     <Version>0.0.0-devbuild</Version>
     <Description>Chickensoft.Log description.</Description>
-    <Copyright>© 2024 Chickensoft</Copyright>
+    <Copyright>© 2025 Chickensoft</Copyright>
     <Authors>Chickensoft</Authors>
     <Company>Chickensoft</Company>
 
@@ -30,11 +30,6 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl></RepositoryUrl>
   </PropertyGroup>
-
-  <!-- Make private members available to test. -->
-  <ItemGroup>
-    <InternalsVisibleTo Include="Chickensoft.Log.Tests" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="\" />
