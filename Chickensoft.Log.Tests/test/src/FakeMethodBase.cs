@@ -1,5 +1,6 @@
 namespace Chickensoft.Log.Tests;
 
+using System;
 using System.Globalization;
 using System.Reflection;
 
