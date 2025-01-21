@@ -10,7 +10,7 @@ Opinionated, simple logging interface and implementations for C#. Forms the basi
 <img alt="Chickensoft.Log" src="Chickensoft.Log/icon.png" width="200">
 </p>
 
-## ⌨️ Getting Started
+## 🥚 Getting Started
 
 > [!TIP]
 > For logging in Godot, see [Chickensoft.Log.Godot][log-godot].
@@ -21,7 +21,7 @@ Install the latest version of the [Chickensoft.Log] package from nuget:
 <PackageReference Include="Chickensoft.Log" Version=... />
 ```
 
-## 📜 Logging
+## 📜 Usage
 
 ### Setup
 
@@ -33,7 +33,7 @@ public class MyClass
 }
 ```
 
-### Output
+### Logging
 
 ```csharp
 public void MyMethod()
