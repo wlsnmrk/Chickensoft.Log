@@ -20,7 +20,8 @@ public class FileLogTest {
     var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
     log.Print(_testMsg);
     mockWriter.Verify(writer =>
-      writer.WriteMessage($"{nameof(FileLogTest)}: {_testMsg}"), Times.Once());
+        writer.WriteMessage($"{nameof(FileLogTest)}: {_testMsg}"),
+      Times.Once());
   }
 
   [Fact]
@@ -29,8 +30,8 @@ public class FileLogTest {
     var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
     log.Err(_testMsg);
     mockWriter.Verify(writer =>
-      writer.WriteError($"ERROR in {nameof(FileLogTest)}: {_testMsg}"),
-        Times.Once());
+        writer.WriteError($"ERROR in {nameof(FileLogTest)}: {_testMsg}"),
+      Times.Once());
   }
 
   [Fact]
@@ -39,7 +40,21 @@ public class FileLogTest {
     var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
     log.Warn(_testMsg);
     mockWriter.Verify(writer =>
-      writer.WriteWarning($"WARNING in {nameof(FileLogTest)}: {_testMsg}"),
-        Times.Once());
+        writer.WriteWarning($"WARNING in {nameof(FileLogTest)}: {_testMsg}"),
+      Times.Once());
+  }
+
+  [Fact]
+  public void PrintsException() {
+    var mockWriter = new Mock<FileLog.IWriter>();
+    var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
+    var e = new TestException(_testMsg);
+    log.Print(e);
+    mockWriter.Verify(writer =>
+        writer.WriteError($"ERROR in {nameof(FileLogTest)}: An error occurred."),
+      Times.Once());
+    mockWriter.Verify(writer =>
+        writer.WriteError($"ERROR in {nameof(FileLogTest)}: {e}"),
+      Times.Once());
   }
 }

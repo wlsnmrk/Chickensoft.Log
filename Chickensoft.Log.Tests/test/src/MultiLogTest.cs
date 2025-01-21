@@ -19,7 +19,7 @@ public class MultiLogTest {
     var logs = new List<ILog> { mockLog1.Object, mockLog2.Object };
     var log = new MultiLog(logs);
     log.Print(_testMsg);
-    mockLog1.Verify(writer => writer.Print(_testMsg), Times.Once());
+    mockLog1.Verify(log => log.Print(_testMsg), Times.Once());
   }
 
   [Fact]
@@ -29,7 +29,7 @@ public class MultiLogTest {
     var logs = new List<ILog> { mockLog1.Object, mockLog2.Object };
     var log = new MultiLog(logs);
     log.Err(_testMsg);
-    mockLog1.Verify(writer => writer.Err(_testMsg), Times.Once());
+    mockLog1.Verify(log => log.Err(_testMsg), Times.Once());
   }
 
   [Fact]
@@ -39,6 +39,18 @@ public class MultiLogTest {
     var logs = new List<ILog> { mockLog1.Object, mockLog2.Object };
     var log = new MultiLog(logs);
     log.Warn(_testMsg);
-    mockLog1.Verify(writer => writer.Warn(_testMsg), Times.Once());
+    mockLog1.Verify(log => log.Warn(_testMsg), Times.Once());
+  }
+
+  [Fact]
+  public void PrintsException() {
+    var mockLog1 = new Mock<ILog>();
+    var mockLog2 = new Mock<ILog>();
+    var logs = new List<ILog> { mockLog1.Object, mockLog2.Object };
+    var log = new MultiLog(logs);
+    var e = new TestException(_testMsg);
+    log.Print(e);
+    mockLog1.Verify(log => log.Print(e), Times.Once());
+    mockLog2.Verify(log => log.Print(e), Times.Once());
   }
 }
