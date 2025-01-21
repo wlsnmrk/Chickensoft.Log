@@ -1,7 +1,8 @@
 namespace Chickensoft.Log.Tests;
 
 using Chickensoft.Log;
-using Moq;
+using LightMock;
+using LightMock.Generator;
 using Shouldly;
 
 public class FileLogTest {
@@ -19,9 +20,9 @@ public class FileLogTest {
     var mockWriter = new Mock<FileLog.IWriter>();
     var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
     log.Print(_testMsg);
-    mockWriter.Verify(writer =>
+    mockWriter.Assert(writer =>
         writer.WriteMessage($"{nameof(FileLogTest)}: {_testMsg}"),
-      Times.Once());
+      Invoked.Once);
   }
 
   [Fact]
@@ -29,9 +30,9 @@ public class FileLogTest {
     var mockWriter = new Mock<FileLog.IWriter>();
     var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
     log.Err(_testMsg);
-    mockWriter.Verify(writer =>
+    mockWriter.Assert(writer =>
         writer.WriteError($"ERROR in {nameof(FileLogTest)}: {_testMsg}"),
-      Times.Once());
+      Invoked.Once);
   }
 
   [Fact]
@@ -39,9 +40,9 @@ public class FileLogTest {
     var mockWriter = new Mock<FileLog.IWriter>();
     var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
     log.Warn(_testMsg);
-    mockWriter.Verify(writer =>
+    mockWriter.Assert(writer =>
         writer.WriteWarning($"WARNING in {nameof(FileLogTest)}: {_testMsg}"),
-      Times.Once());
+      Invoked.Once);
   }
 
   [Fact]
@@ -50,12 +51,12 @@ public class FileLogTest {
     var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
     var e = new TestException(_testMsg);
     log.Print(e);
-    mockWriter.Verify(writer =>
+    mockWriter.Assert(writer =>
         writer.WriteError($"ERROR in {nameof(FileLogTest)}: An error occurred."),
-      Times.Once());
-    mockWriter.Verify(writer =>
+      Invoked.Once);
+    mockWriter.Assert(writer =>
         writer.WriteError($"ERROR in {nameof(FileLogTest)}: {e}"),
-      Times.Once());
+      Invoked.Once);
   }
 
   [Fact]
@@ -64,9 +65,9 @@ public class FileLogTest {
     var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
     var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
     log.Print(st);
-    mockWriter.Verify(static writer =>
+    mockWriter.Assert(static writer =>
         writer.WriteError($"ERROR in {nameof(FileLogTest)}: ClassName.MethodName in File.cs(1,2)"),
-      Times.Once()
+      Invoked.Once
     );
   }
 }

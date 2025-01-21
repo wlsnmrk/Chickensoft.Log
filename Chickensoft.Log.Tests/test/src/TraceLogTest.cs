@@ -1,6 +1,7 @@
 namespace Chickensoft.Log.Tests;
 
-using Moq;
+using LightMock;
+using LightMock.Generator;
 using Shouldly;
 
 public class TraceLogTest {
@@ -18,9 +19,9 @@ public class TraceLogTest {
     var mockWriter = new Mock<TraceLog.IWriter>();
     var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
     log.Print(_testMsg);
-    mockWriter.Verify(writer =>
+    mockWriter.Assert(writer =>
         writer.WriteMessage($"{nameof(TraceLogTest)}: {_testMsg}"),
-      Times.Once());
+      Invoked.Once);
   }
 
   [Fact]
@@ -28,9 +29,9 @@ public class TraceLogTest {
     var mockWriter = new Mock<TraceLog.IWriter>();
     var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
     log.Err(_testMsg);
-    mockWriter.Verify(writer =>
+    mockWriter.Assert(writer =>
         writer.WriteError($"{nameof(TraceLogTest)}: {_testMsg}"),
-      Times.Once());
+      Invoked.Once);
   }
 
   [Fact]
@@ -38,9 +39,9 @@ public class TraceLogTest {
     var mockWriter = new Mock<TraceLog.IWriter>();
     var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
     log.Warn(_testMsg);
-    mockWriter.Verify(writer =>
+    mockWriter.Assert(writer =>
         writer.WriteWarning($"WARNING in {nameof(TraceLogTest)}: {_testMsg}"),
-      Times.Once());
+      Invoked.Once);
   }
 
   [Fact]
@@ -49,12 +50,12 @@ public class TraceLogTest {
     var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
     var e = new TestException(_testMsg);
     log.Print(e);
-    mockWriter.Verify(writer =>
+    mockWriter.Assert(writer =>
         writer.WriteError($"{nameof(TraceLogTest)}: An error occurred."),
-      Times.Once());
-    mockWriter.Verify(writer =>
+      Invoked.Once);
+    mockWriter.Assert(writer =>
         writer.WriteError($"{nameof(TraceLogTest)}: {e}"),
-      Times.Once());
+      Invoked.Once);
   }
 
   [Fact]
@@ -63,9 +64,9 @@ public class TraceLogTest {
     var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
     var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
     log.Print(st);
-    mockWriter.Verify(static writer =>
+    mockWriter.Assert(static writer =>
         writer.WriteError($"{nameof(TraceLogTest)}: ClassName.MethodName in File.cs(1,2)"),
-      Times.Once()
+      Invoked.Once
     );
   }
 }
