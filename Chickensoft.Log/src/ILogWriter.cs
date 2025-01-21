@@ -1,8 +1,8 @@
 namespace Chickensoft.Log;
 
 /// <summary>
-/// Writer interface providing file-writing functionality to
-/// <see cref="FileLog"/>.
+/// Optional interface for providing output-writing functionality to
+/// <see cref="ILog"/>.
 /// </summary>
 public interface ILogWriter {
   /// <summary>
