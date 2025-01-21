@@ -56,4 +56,16 @@ public class TraceLogTest {
         writer.WriteError($"{nameof(TraceLogTest)}: {e}"),
       Times.Once());
   }
+
+  [Fact]
+  public void PrintsStackTrace() {
+    var mockWriter = new Mock<TraceLog.IWriter>();
+    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
+    var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
+    log.Print(st);
+    mockWriter.Verify(static writer =>
+        writer.WriteError($"{nameof(TraceLogTest)}: ClassName.MethodName in File.cs(1,2)"),
+      Times.Once()
+    );
+  }
 }

@@ -14,43 +14,58 @@ public class MultiLogTest {
 
   [Fact]
   public void PrintsMessage() {
-    var mockLog1 = new Mock<ILog>();
-    var mockLog2 = new Mock<ILog>();
-    var logs = new List<ILog> { mockLog1.Object, mockLog2.Object };
+    var mockLogs = new List<Mock<ILog>> { new(), new() };
+    var logs = (from ml in mockLogs select ml.Object).ToList();
     var log = new MultiLog(logs);
     log.Print(_testMsg);
-    mockLog1.Verify(log => log.Print(_testMsg), Times.Once());
+    foreach (var ml in mockLogs) {
+      ml.Verify(log => log.Print(_testMsg), Times.Once());
+    }
   }
 
   [Fact]
   public void PrintsError() {
-    var mockLog1 = new Mock<ILog>();
-    var mockLog2 = new Mock<ILog>();
-    var logs = new List<ILog> { mockLog1.Object, mockLog2.Object };
+    var mockLogs = new List<Mock<ILog>> { new(), new() };
+    var logs = (from ml in mockLogs select ml.Object).ToList();
     var log = new MultiLog(logs);
     log.Err(_testMsg);
-    mockLog1.Verify(log => log.Err(_testMsg), Times.Once());
+    foreach (var ml in mockLogs) {
+      ml.Verify(log => log.Err(_testMsg), Times.Once());
+    }
   }
 
   [Fact]
   public void PrintsWarning() {
-    var mockLog1 = new Mock<ILog>();
-    var mockLog2 = new Mock<ILog>();
-    var logs = new List<ILog> { mockLog1.Object, mockLog2.Object };
+    var mockLogs = new List<Mock<ILog>> { new(), new() };
+    var logs = (from ml in mockLogs select ml.Object).ToList();
     var log = new MultiLog(logs);
     log.Warn(_testMsg);
-    mockLog1.Verify(log => log.Warn(_testMsg), Times.Once());
+    foreach (var ml in mockLogs) {
+      ml.Verify(log => log.Warn(_testMsg), Times.Once());
+    }
   }
 
   [Fact]
   public void PrintsException() {
-    var mockLog1 = new Mock<ILog>();
-    var mockLog2 = new Mock<ILog>();
-    var logs = new List<ILog> { mockLog1.Object, mockLog2.Object };
+    var mockLogs = new List<Mock<ILog>> { new(), new() };
+    var logs = (from ml in mockLogs select ml.Object).ToList();
     var log = new MultiLog(logs);
     var e = new TestException(_testMsg);
     log.Print(e);
-    mockLog1.Verify(log => log.Print(e), Times.Once());
-    mockLog2.Verify(log => log.Print(e), Times.Once());
+    foreach (var ml in mockLogs) {
+      ml.Verify(log => log.Print(e), Times.Once());
+    }
+  }
+
+  [Fact]
+  public void PrintsStackTrace() {
+    var mockLogs = new List<Mock<ILog>> { new(), new() };
+    var logs = (from ml in mockLogs select ml.Object).ToList();
+    var log = new MultiLog(logs);
+    var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
+    log.Print(st);
+    foreach (var ml in mockLogs) {
+      ml.Verify(log => log.Print(st), Times.Once());
+    }
   }
 }
