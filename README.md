@@ -2,7 +2,7 @@
 
 [![Chickensoft Badge][chickensoft-badge]][chickensoft-website] [![Discord][discord-badge]][discord] [![Read the docs][read-the-docs-badge]][docs] ![line coverage][line-coverage] ![branch coverage][branch-coverage]
 
-Opinionated, simple logging interface and implementations for C#. Forms the basis for [Log.Godot][log-godot].
+Opinionated, simple logging interface and implementations for C# applications and libraries. Forms the basis for [Log.Godot][log-godot].
 
 ---
 
@@ -33,43 +33,89 @@ public class MyClass
 }
 ```
 
+Optionally, you can provide an `ILogFormatter` that the log will use to format its name, the level of the log message, and the log message itself. (By default, logs included with the package will use the standard `LogFormatter`.)
+
+```csharp
+public class MyClass
+{
+  private ILog _log = new ConsoleLog(nameof(MyClass))
+  {
+    Formatter = new MyFormatter()
+  };
+}
+```
+
 ### Logging
 
 ```csharp
 public void MyMethod()
 {
-  _log.Print("A log message");
-  _log.Warn("A warning message");
-  _log.Err("An error occurred");
+  _log.Print("A log message"); // Outputs "Info (MyClass): A log message"
+  _log.Warn("A warning message"); // Outputs "Warn (MyClass): A warning message"
+  _log.Err("An error occurred"); // Outputs "Error (MyClass): An error occurred"
   try
   {
     SomethingThatThrows();
   }
   catch (Exception e)
   {
-    _log.Print(e);
-    // handle exception
+    _log.Print(e); // Outputs the value of e.ToString(), prefixed by a line labeling it as an exception
+    // ...
   }
 }
 ```
 
+### Formatting
+
+Messages are formatted with one of three level labels, depending which log method you call. By default, the included `LogFormatter` uses the labels `"Info"`, `"Warn"`, and `"Error"`. You can change these labels for an individual `LogFormatter`:
+
+```csharp
+var formatter = new LogFormatter();
+formatter.MessagePrefix = "INFO";
+formatter.WarningPrefix = "WARN";
+formatter.ErrorPrefix = "ERROR";
+```
+
+You can also change the default values for these labels:
+
+```csharp
+LogFormatter.DefaultMessagePrefix = "INFO";
+LogFormatter.DefaultWarningPrefix = "WARN";
+LogFormatter.DefaultErrorPrefix = "ERROR";
+```
+
+> [!WARNING]
+> Changing the default values for the level labels will affect newly-created `LogFormatter`s, but will not affect ones that already exist.
+
 ## 🪵 Log Types
 
-The Log package provides four log types implementing the `ILog` interface:
+The Log package provides four operational log types implementing the `ILog` interface:
 
 * `ConsoleLog`: Outputs log messages to stdout/stderr.
 * `TraceLog`: Outputs log messages to .NET's `Trace` system. This is useful for seeing log output in Visual Studio's "Output" tab while debugging.
 * `FileLog`: Outputs log messages to file. All `FileLog`s will write to a file called "output.log" in the working directory by default, but you can either configure a different default, or configure individual `FileLog`s to write to particular files on creation.
 * `MultiLog`: Delegates log messages to multiple other logs, allowing you to log the same message to, e.g., stdout/stderr and to file with one method call.
 
-### Using FileLog
+The package provides one additional, non-operational log type, `TestLog`, which may be useful for testing your code without mocking `ILog`.
 
-Create a log that outputs messages to the default filename ("output.log"):
+### Using `FileLog`
+
+Create a log that outputs messages to the default filename `"output.log"`:
 
 ```csharp
 public class MyClass
 {
   private ILog _log = new FileLog(nameof(MyClass));
+}
+```
+
+---
+Create a log that outputs messages to a custom filename:
+
+```csharp
+public class MyClass
+{
+  private ILog _log = new FileLog(nameof(MyClass), "CustomFileName.log");
 }
 ```
 
@@ -92,13 +138,33 @@ public class MyClass
 }
 ```
 
----
-Create a log that outputs messages to a custom filename:
+### Using `TestLog`
+
+When testing code that uses an `ILog`, it may be cumbersome to mock `ILog`'s methods. In that case, you may prefer to use the provided `TestLog` type, which accumulates log messages for testing:
 
 ```csharp
 public class MyClass
 {
-  private ILog _log = new FileLog(nameof(MyClass), "CustomFileName.log");
+  public ILog Log { get; set; } = new ConsoleLog();
+
+  public void MyMethod()
+  {
+    Log.Print("A normal log message");
+    Log.Err("An error message");
+  }
+}
+
+public class MyClassTest
+{
+  [Fact]
+  public void MyMethodLogs()
+  {
+    var obj = new MyClass() { Log = new TestLog() };
+    obj.MyMethod();
+    obj.Log.LoggedMessages.Count.ShouldBe(2);
+    obj.Log.LoggedMessages[0].ShouldBe("Info (Test): A normal log message");
+    obj.Log.LoggedMessages[1].ShouldBe("Error (Test): An error message");
+  }
 }
 ```
 
