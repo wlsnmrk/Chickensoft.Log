@@ -1,6 +1,5 @@
 namespace Chickensoft.Log.Tests;
 
-using System;
 using LightMock;
 using LightMock.Generator;
 using Shouldly;
@@ -34,8 +33,8 @@ public class TestLogTest {
         formatter.FormatMessage(log.Name, TEST_MSG),
       Invoked.Once);
 
-    log.LoggedTextBuilder.ToString()
-      .ShouldBe(formattedTestMsg + Environment.NewLine);
+    log.LoggedMessages.Count.ShouldBe(1);
+    log.LoggedMessages[0].ShouldBe(formattedTestMsg);
   }
 
   [Fact]
@@ -54,8 +53,8 @@ public class TestLogTest {
         formatter.FormatError(log.Name, TEST_MSG),
       Invoked.Once);
 
-    log.LoggedTextBuilder.ToString()
-      .ShouldBe(formattedTestMsg + Environment.NewLine);
+    log.LoggedMessages.Count.ShouldBe(1);
+    log.LoggedMessages[0].ShouldBe(formattedTestMsg);
   }
 
   [Fact]
@@ -74,8 +73,8 @@ public class TestLogTest {
         formatter.FormatWarning(log.Name, TEST_MSG),
       Invoked.Once);
 
-    log.LoggedTextBuilder.ToString()
-      .ShouldBe(formattedTestMsg + Environment.NewLine);
+    log.LoggedMessages.Count.ShouldBe(1);
+    log.LoggedMessages[0].ShouldBe(formattedTestMsg);
   }
 
   [Fact]
@@ -104,9 +103,9 @@ public class TestLogTest {
         formatter.FormatError(log.Name, eMsg),
       Invoked.Once);
 
-    log.LoggedTextBuilder.ToString()
-      .ShouldBe(formattedExceptionMsg + Environment.NewLine
-        + formattedException + Environment.NewLine);
+    log.LoggedMessages.Count.ShouldBe(2);
+    log.LoggedMessages[0].ShouldBe(formattedExceptionMsg);
+    log.LoggedMessages[1].ShouldBe(formattedException);
   }
 
   [Fact]
@@ -128,7 +127,7 @@ public class TestLogTest {
         formatter.FormatMessage(log.Name, expectedStackTraceMsg),
       Invoked.Once);
 
-    log.LoggedTextBuilder.ToString()
-      .ShouldBe(formattedStackTraceMsg + Environment.NewLine);
+    log.LoggedMessages.Count.ShouldBe(1);
+    log.LoggedMessages[0].ShouldBe(formattedStackTraceMsg);
   }
 }

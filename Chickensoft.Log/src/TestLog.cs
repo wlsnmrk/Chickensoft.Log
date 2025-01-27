@@ -1,8 +1,8 @@
 namespace Chickensoft.Log;
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 /// <summary>
 /// An <see cref="ILog"/> that accumulates messages written to it so users can
@@ -21,18 +21,18 @@ public class TestLog : ILog {
   public ILogFormatter Formatter { get; set; } = new LogFormatter();
 
   /// <summary>
-  /// Contains all logged text.
+  /// Contains all logged messages as separate elements.
   /// </summary>
-  public StringBuilder LoggedTextBuilder { get; set; } = new();
+  public IList<string> LoggedMessages { get; set; } = [];
 
   /// <inheritdoc/>
   public void Err(string message) {
-    LoggedTextBuilder.AppendLine(Formatter.FormatError(Name, message));
+    LoggedMessages.Add(Formatter.FormatError(Name, message));
   }
 
   /// <inheritdoc/>
   public void Print(string message) {
-    LoggedTextBuilder.AppendLine(Formatter.FormatMessage(Name, message));
+    LoggedMessages.Add(Formatter.FormatMessage(Name, message));
   }
 
   /// <inheritdoc/>
@@ -59,6 +59,6 @@ public class TestLog : ILog {
 
   /// <inheritdoc/>
   public void Warn(string message) {
-    LoggedTextBuilder.AppendLine(Formatter.FormatWarning(Name, message));
+    LoggedMessages.Add(Formatter.FormatWarning(Name, message));
   }
 }
