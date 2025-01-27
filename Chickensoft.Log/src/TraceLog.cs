@@ -3,8 +3,8 @@ using System;
 using System.Diagnostics;
 
 /// <summary>
-/// A logger that uses <see cref="Trace"/> to output log messages.
-/// Useful for seeing output in Visual Studio's Output window while debugging.
+/// A log that uses <see cref="Trace"/> to output log messages. Useful for
+/// observing output in Visual Studio's Output window while debugging.
 /// </summary>
 /// <remarks>
 /// To enable <see cref="Trace"/> output in the VS Output window,
@@ -43,47 +43,46 @@ public sealed class TraceLog : ILog {
 
   private readonly IWriter _writer;
 
-  /// <summary>
-  /// The prefix string which will be prepended to all messages before output.
-  /// </summary>
-  public string Prefix { get; }
+  /// <inheritdoc/>
+  public string Name { get; }
 
   /// <summary>
-  /// Create a trace logger with the given prefix string.
+  /// Create a trace log with the given name.
   /// </summary>
-  /// <param name="prefix">
-  /// The prefix string to prepend to messages directed through this logger (see
-  /// <see cref="Prefix"/>). A common value is <c>nameof(EncapsulatingClass)</c>.
+  /// <param name="name">
+  /// The name associated with this log. Will be included in messages directed
+  /// through this log (see <see cref="Name"/>).
+  /// A common value is <c>nameof(EncapsulatingClass)</c>.
   /// </param>
-  public TraceLog(string prefix) {
-    Prefix = prefix;
+  public TraceLog(string name) {
+    Name = name;
     _writer = new Writer();
   }
 
   /// <summary>
-  /// Create a trace logger with the given prefix string and writer. Useful
-  /// for testing.
+  /// Create a trace log with the given name and writer. Useful for testing.
   /// </summary>
-  /// <param name="prefix">
-  /// The prefix string to prepend to messages directed through this logger (see
-  /// <see cref="Prefix"/>). A common value is <c>nameof(EncapsulatingClass)</c>.
+  /// <param name="name">
+  /// The name associated with this log. Will be included in messages directed
+  /// through this log (see <see cref="Name"/>).
+  /// A common value is <c>nameof(EncapsulatingClass)</c>.
   /// </param>
   /// <param name="writer">
   /// The writer to use for outputting log messages.
   /// </param>
-  public TraceLog(string prefix, IWriter writer) {
-    Prefix = prefix;
+  public TraceLog(string name, IWriter writer) {
+    Name = name;
     _writer = writer;
   }
 
   /// <inheritdoc/>
   public void Err(string message) {
-    _writer.WriteError($"{Prefix}: {message}");
+    _writer.WriteError($"{Name}: {message}");
   }
 
   /// <inheritdoc/>
   public void Print(string message) {
-    _writer.WriteMessage($"{Prefix}: {message}");
+    _writer.WriteMessage($"{Name}: {message}");
   }
 
   /// <inheritdoc/>
@@ -110,6 +109,6 @@ public sealed class TraceLog : ILog {
 
   /// <inheritdoc/>
   public void Warn(string message) {
-    _writer.WriteWarning($"WARNING in {Prefix}: {message}");
+    _writer.WriteWarning($"WARNING in {Name}: {message}");
   }
 }

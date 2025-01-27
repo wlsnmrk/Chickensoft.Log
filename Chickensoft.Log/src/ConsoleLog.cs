@@ -35,49 +35,47 @@ public class ConsoleLog : ILog {
 
   private readonly IWriter _writer;
 
-  /// <summary>
-  /// The prefix string which will be prepended to all messages before output.
-  /// </summary>
-  public string Prefix { get; }
+  /// <inheritdoc/>
+  public string Name { get; }
 
   /// <summary>
-  /// Create a logger using the given prefix string and standard out/err.
+  /// Create a logger using the given name and standard out/err.
   /// </summary>
-  /// <param name="prefix">
-  /// The prefix string to prepend to messages directed through this logger (see
-  /// <see cref="Prefix"/>).
+  /// <param name="name">
+  /// The name associated with this log. Will be included in messages directed
+  /// through this log (see <see cref="Name"/>).
   /// A common value is <c>nameof(EncapsulatingClass)</c>.
   /// </param>
-  public ConsoleLog(string prefix) {
-    Prefix = prefix;
+  public ConsoleLog(string name) {
+    Name = name;
     _writer = new Writer();
   }
 
   /// <summary>
-  /// Create a logger using the given prefix string and the provided
+  /// Create a logger using the given name and the provided
   /// <see cref="IWriter"/> for output. Useful for testing.
   /// </summary>
-  /// <param name="prefix">
-  /// The prefix string to prepend to messages directed through this logger (see
-  /// <see cref="Prefix"/>).
+  /// <param name="name">
+  /// The name associated with this log. Will be included in messages directed
+  /// through this log (see <see cref="Name"/>).
   /// A common value is <c>nameof(EncapsulatingClass)</c>.
   /// </param>
   /// <param name="writer">
   /// The writer to use for outputting log messages.
   /// </param>
-  public ConsoleLog(string prefix, IWriter writer) {
-    Prefix = prefix;
+  public ConsoleLog(string name, IWriter writer) {
+    Name = name;
     _writer = writer;
   }
 
   /// <inheritdoc/>
   public void Err(string message) {
-    _writer.WriteError($"{Prefix}: {message}");
+    _writer.WriteError($"{Name}: {message}");
   }
 
   /// <inheritdoc/>
   public void Print(string message) {
-    _writer.WriteMessage($"{Prefix}: {message}");
+    _writer.WriteMessage($"{Name}: {message}");
   }
 
   /// <inheritdoc/>
@@ -104,6 +102,6 @@ public class ConsoleLog : ILog {
 
   /// <inheritdoc/>
   public void Warn(string message) {
-    _writer.WriteWarning($"WARNING in {Prefix}: {message}");
+    _writer.WriteWarning($"WARNING in {Name}: {message}");
   }
 }

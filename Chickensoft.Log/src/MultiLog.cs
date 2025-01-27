@@ -11,6 +11,12 @@ using System.Diagnostics;
 /// </summary>
 public sealed class MultiLog : ILog {
   /// <summary>
+  /// The name associated with this log. Is always empty; output will use the
+  /// names associated with respective logs in <see cref="Logs"/>.
+  /// </summary>
+  public string Name { get; } = string.Empty;
+
+  /// <summary>
   /// The logs to which this log will write all messages.
   /// </summary>
   public IList<ILog> Logs { get; } = [];

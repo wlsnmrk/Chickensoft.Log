@@ -116,67 +116,65 @@ public sealed class FileLog : ILog {
 
   private readonly IWriter _writer;
 
-  /// <summary>
-  /// The prefix string which will be prepended to all messages before output.
-  /// </summary>
-  public string Prefix { get; }
+  /// <inheritdoc/>
+  public string Name { get; }
 
   /// <summary>
-  /// Create a <see cref="FileLog"/> using the given prefix string and default
+  /// Create a <see cref="FileLog"/> using the given name and default
   /// file name (<see cref="Writer.DefaultFileName"/>).
   /// </summary>
-  /// <param name="prefix">
-  /// The prefix string to prepend to messages directed through this logger (see
-  /// <see cref="Prefix"/>).
+  /// <param name="name">
+  /// The name associated with this log. Will be included in messages directed
+  /// through this log (see <see cref="Name"/>).
   /// A common value is <c>nameof(EncapsulatingClass)</c>.
   /// </param>
-  public FileLog(string prefix) {
+  public FileLog(string name) {
     _writer = Writer.Instance();
-    Prefix = prefix;
+    Name = name;
   }
 
   /// <summary>
-  /// Create a <see cref="FileLog"/> using the given prefix string and
+  /// Create a <see cref="FileLog"/> using the given name,
   /// outputting to the given file name.
   /// </summary>
-  /// <param name="prefix">
-  /// The prefix string to prepend to messages directed through this logger (see
-  /// <see cref="Prefix"/>).
+  /// <param name="name">
+  /// The name associated with this log. Will be included in messages directed
+  /// through this log (see <see cref="Name"/>).
   /// A common value is <c>nameof(EncapsulatingClass)</c>.
   /// </param>
   /// <param name="fileName">
   /// The path for the file where logs should be written.
   /// </param>
-  public FileLog(string prefix, string fileName) {
+  public FileLog(string name, string fileName) {
     _writer = Writer.Instance(fileName);
-    Prefix = prefix;
+    Name = name;
   }
 
   /// <summary>
-  /// Create a <see cref="FileLog"/> using the given prefix string and
-  /// <see cref="IWriter"/> to output to a particular file. Useful for testing.
+  /// Create a <see cref="FileLog"/> using the given name and
+  /// <see cref="IWriter"/> to output. Useful for testing.
   /// </summary>
-  /// <param name="prefix">
-  /// The prefix string to prepend to messages directed through this logger (see
-  /// <see cref="Prefix"/>).
+  /// <param name="name">
+  /// The name associated with this log. Will be included in messages directed
+  /// through this log (see <see cref="Name"/>).
   /// A common value is <c>nameof(EncapsulatingClass)</c>.
   /// </param>
   /// <param name="writer">
   /// The writer to use for outputting log messages.
   /// </param>
-  public FileLog(string prefix, IWriter writer) {
+  public FileLog(string name, IWriter writer) {
     _writer = writer;
-    Prefix = prefix;
+    Name = name;
   }
 
   /// <inheritdoc/>
   public void Err(string message) {
-    _writer.WriteError(ERROR_PREFIX + " in " + Prefix + ": " + message);
+    _writer.WriteError(ERROR_PREFIX + " in " + Name + ": " + message);
   }
 
   /// <inheritdoc/>
   public void Print(string message) {
-    _writer.WriteMessage(Prefix + ": " + message);
+    _writer.WriteMessage(Name + ": " + message);
   }
 
   /// <inheritdoc/>
@@ -203,6 +201,6 @@ public sealed class FileLog : ILog {
 
   /// <inheritdoc/>
   public void Warn(string message) {
-    _writer.WriteWarning(WARNING_PREFIX + " in " + Prefix + ": " + message);
+    _writer.WriteWarning(WARNING_PREFIX + " in " + Name + ": " + message);
   }
 }

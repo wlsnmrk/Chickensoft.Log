@@ -9,6 +9,12 @@ using System.Diagnostics;
 /// </summary>
 public interface ILog {
   /// <summary>
+  /// The name associated with this log. Will be used in output so that all
+  /// messages from a single log can be identified.
+  /// </summary>
+  public string Name { get; }
+
+  /// <summary>
   /// Prints the specified message to the log.
   /// </summary>
   /// <param name="message">Message to output.</param>
