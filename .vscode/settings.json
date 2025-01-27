@@ -10,6 +10,8 @@
     "editor.formatOnType": false
   },
   "csharp.semanticHighlighting.enabled": true,
+  // we don't need a launch.json - the test task is in tasks.json
+  "csharp.suppressBuildAssetsNotification": true,
   "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
   // Required to keep the C# language server from getting confused about which
   // solution to open.
