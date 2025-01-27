@@ -118,7 +118,7 @@ public sealed class FileLog : ILog {
 
   /// <summary>
   /// The formatter that will be used to format messages before writing them
-  /// to the console. Defaults to an instance of <see cref="LogFormatter"/>.
+  /// to the file. Defaults to an instance of <see cref="LogFormatter"/>.
   /// </summary>
   public ILogFormatter Formatter { get; set; } = new LogFormatter();
 

@@ -48,7 +48,7 @@ public sealed class TraceLog : ILog {
 
   /// <summary>
   /// The formatter that will be used to format messages before writing them
-  /// to the console. Defaults to an instance of <see cref="LogFormatter"/>.
+  /// to <see cref="Trace"/>. Defaults to an instance of <see cref="LogFormatter"/>.
   /// </summary>
   public ILogFormatter Formatter { get; set; } = new LogFormatter();
 
