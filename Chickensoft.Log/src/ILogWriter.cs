@@ -12,7 +12,7 @@ public interface ILogWriter {
   /// <param name="message">
   /// The string to write to this <see cref="ILogWriter"/>'s output.
   /// </param>
-  void WriteMessage(string message);
+  public void WriteMessage(string message);
 
   /// <summary>
   /// Appends the given warning to this <see cref="ILogWriter"/>'s output, on a
@@ -21,7 +21,7 @@ public interface ILogWriter {
   /// <param name="message">
   /// The warning to write to this <see cref="ILogWriter"/>'s output.
   /// </param>
-  void WriteWarning(string message);
+  public void WriteWarning(string message);
 
   /// <summary>
   /// Appends the given error to this <see cref="ILogWriter"/>'s output, on a
@@ -30,5 +30,5 @@ public interface ILogWriter {
   /// <param name="message">
   /// The error to write to this <see cref="ILogWriter"/>'s output.
   /// </param>
-  void WriteError(string message);
+  public void WriteError(string message);
 }

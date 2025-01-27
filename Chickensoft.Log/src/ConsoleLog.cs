@@ -17,6 +17,7 @@ public class ConsoleLog : ILog {
   /// to the console.
   /// </summary>
   public class Writer : IWriter {
+
     /// <inheritdoc/>
     public void WriteError(string message) {
       Console.Error.WriteLine(message);
@@ -37,6 +38,12 @@ public class ConsoleLog : ILog {
 
   /// <inheritdoc/>
   public string Name { get; }
+
+  /// <summary>
+  /// The formatter that will be used to format messages before writing them
+  /// to the console. Defaults to an instance of <see cref="LogFormatter"/>.
+  /// </summary>
+  public ILogFormatter Formatter { get; set; } = new LogFormatter();
 
   /// <summary>
   /// Create a logger using the given name and standard out/err.
@@ -70,12 +77,12 @@ public class ConsoleLog : ILog {
 
   /// <inheritdoc/>
   public void Err(string message) {
-    _writer.WriteError($"{Name}: {message}");
+    _writer.WriteError(Formatter.FormatError(Name, message));
   }
 
   /// <inheritdoc/>
   public void Print(string message) {
-    _writer.WriteMessage($"{Name}: {message}");
+    _writer.WriteMessage(Formatter.FormatMessage(Name, message));
   }
 
   /// <inheritdoc/>
@@ -87,7 +94,7 @@ public class ConsoleLog : ILog {
       var method = frame.GetMethod();
       var className = method?.DeclaringType?.Name ?? "UnknownClass";
       var methodName = method?.Name ?? "UnknownMethod";
-      Err(
+      Print(
         $"{className}.{methodName} in " +
         $"{fileName}({lineNumber},{colNumber})"
       );
@@ -96,12 +103,12 @@ public class ConsoleLog : ILog {
 
   /// <inheritdoc/>
   public void Print(Exception e) {
-    Err("An error occurred.");
+    Err("Exception:");
     Err(e.ToString());
   }
 
   /// <inheritdoc/>
   public void Warn(string message) {
-    _writer.WriteWarning($"WARNING in {Name}: {message}");
+    _writer.WriteWarning(Formatter.FormatWarning(Name, message));
   }
 }

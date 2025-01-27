@@ -5,7 +5,11 @@ using LightMock.Generator;
 using Shouldly;
 
 public class TraceLogTest {
-  private readonly string _testMsg = "A test message";
+  private static readonly string _testMsg = "A test message";
+
+  private static string Format(string msg) {
+    return $"MockLevel ({nameof(FileLogTest)}): {msg}";
+  }
 
   [Fact]
   public void Initializes() {
@@ -16,56 +20,132 @@ public class TraceLogTest {
 
   [Fact]
   public void PrintsMessage() {
+    var formattedTestMsg = Format(_testMsg);
+    var mockFormatter = new Mock<ILogFormatter>();
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatMessage(nameof(TraceLogTest), _testMsg))
+      .Returns(formattedTestMsg);
+
     var mockWriter = new Mock<TraceLog.IWriter>();
-    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
+    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
+      Formatter = mockFormatter.Object
+    };
     log.Print(_testMsg);
+
+    mockFormatter.Assert(formatter =>
+        formatter.FormatMessage(nameof(TraceLogTest), _testMsg),
+      Invoked.Once);
+
     mockWriter.Assert(writer =>
-        writer.WriteMessage($"{nameof(TraceLogTest)}: {_testMsg}"),
+        writer.WriteMessage(formattedTestMsg),
       Invoked.Once);
   }
 
   [Fact]
   public void PrintsError() {
+    var formattedTestMsg = Format(_testMsg);
+    var mockFormatter = new Mock<ILogFormatter>();
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), _testMsg))
+      .Returns(formattedTestMsg);
+
     var mockWriter = new Mock<TraceLog.IWriter>();
-    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
+    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
+      Formatter = mockFormatter.Object
+    };
     log.Err(_testMsg);
+
+    mockFormatter.Assert(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), _testMsg),
+      Invoked.Once);
+
     mockWriter.Assert(writer =>
-        writer.WriteError($"{nameof(TraceLogTest)}: {_testMsg}"),
+        writer.WriteError(formattedTestMsg),
       Invoked.Once);
   }
 
   [Fact]
   public void PrintsWarning() {
+    var formattedTestMsg = Format(_testMsg);
+    var mockFormatter = new Mock<ILogFormatter>();
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatWarning(nameof(TraceLogTest), _testMsg))
+      .Returns(formattedTestMsg);
+
     var mockWriter = new Mock<TraceLog.IWriter>();
-    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
+    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
+      Formatter = mockFormatter.Object
+    };
     log.Warn(_testMsg);
+
+    mockFormatter.Assert(formatter =>
+        formatter.FormatWarning(nameof(TraceLogTest), _testMsg),
+      Invoked.Once);
+
     mockWriter.Assert(writer =>
-        writer.WriteWarning($"WARNING in {nameof(TraceLogTest)}: {_testMsg}"),
+        writer.WriteWarning(formattedTestMsg),
       Invoked.Once);
   }
 
   [Fact]
   public void PrintsException() {
-    var mockWriter = new Mock<TraceLog.IWriter>();
-    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
     var e = new TestException(_testMsg);
+    var eMsg = e.ToString();
+    var formattedExceptionMsg = Format("Exception:");
+    var formattedException = Format(eMsg);
+
+    var mockFormatter = new Mock<ILogFormatter>();
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), "Exception:"))
+      .Returns(formattedExceptionMsg);
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), eMsg))
+      .Returns(formattedException);
+
+    var mockWriter = new Mock<TraceLog.IWriter>();
+    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
+      Formatter = mockFormatter.Object
+    };
     log.Print(e);
+
+    mockFormatter.Assert(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), "Exception:"),
+      Invoked.Once);
+    mockFormatter.Assert(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), eMsg),
+      Invoked.Once);
+
     mockWriter.Assert(writer =>
-        writer.WriteError($"{nameof(TraceLogTest)}: An error occurred."),
+        writer.WriteError(formattedExceptionMsg),
       Invoked.Once);
     mockWriter.Assert(writer =>
-        writer.WriteError($"{nameof(TraceLogTest)}: {e}"),
+        writer.WriteError(formattedException),
       Invoked.Once);
   }
 
   [Fact]
   public void PrintsStackTrace() {
+    var expectedStackTraceMsg = "ClassName.MethodName in File.cs(1,2)";
+    var formattedStackTraceMsg = Format(expectedStackTraceMsg);
+
+    var mockFormatter = new Mock<ILogFormatter>();
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatMessage(nameof(TraceLogTest), expectedStackTraceMsg))
+      .Returns(formattedStackTraceMsg);
+
     var mockWriter = new Mock<TraceLog.IWriter>();
-    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object);
+    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
+      Formatter = mockFormatter.Object
+    };
     var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
     log.Print(st);
-    mockWriter.Assert(static writer =>
-        writer.WriteError($"{nameof(TraceLogTest)}: ClassName.MethodName in File.cs(1,2)"),
+
+    mockFormatter.Assert(formatter =>
+        formatter.FormatMessage(nameof(TraceLogTest), expectedStackTraceMsg),
+      Invoked.Once);
+
+    mockWriter.Assert(writer =>
+        writer.WriteMessage(formattedStackTraceMsg),
       Invoked.Once
     );
   }

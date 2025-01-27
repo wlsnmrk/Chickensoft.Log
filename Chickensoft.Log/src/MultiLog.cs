@@ -33,7 +33,7 @@ public sealed class MultiLog : ILog {
   /// </summary>
   /// <param name="logs">Logs to which this MultiLog will write.</param>
   public MultiLog(IList<ILog> logs) {
-    Logs = new List<ILog>(logs);
+    Logs = [.. logs];
   }
 
   /// <inheritdoc/>
