@@ -17,7 +17,6 @@ public class ConsoleLog : ILog {
   /// to the console.
   /// </summary>
   public class Writer : IWriter {
-
     /// <inheritdoc/>
     public void WriteError(string message) {
       Console.Error.WriteLine(message);

@@ -5,7 +5,7 @@ using LightMock.Generator;
 using Shouldly;
 
 public class TraceLogTest {
-  private static readonly string _testMsg = "A test message";
+  private const string TEST_MSG = "A test message";
 
   private static string Format(string msg) {
     return $"MockLevel ({nameof(FileLogTest)}): {msg}";
@@ -20,20 +20,20 @@ public class TraceLogTest {
 
   [Fact]
   public void PrintsMessage() {
-    var formattedTestMsg = Format(_testMsg);
+    var formattedTestMsg = Format(TEST_MSG);
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
-        formatter.FormatMessage(nameof(TraceLogTest), _testMsg))
+        formatter.FormatMessage(nameof(TraceLogTest), TEST_MSG))
       .Returns(formattedTestMsg);
 
     var mockWriter = new Mock<TraceLog.IWriter>();
     var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
       Formatter = mockFormatter.Object
     };
-    log.Print(_testMsg);
+    log.Print(TEST_MSG);
 
     mockFormatter.Assert(formatter =>
-        formatter.FormatMessage(nameof(TraceLogTest), _testMsg),
+        formatter.FormatMessage(nameof(TraceLogTest), TEST_MSG),
       Invoked.Once);
 
     mockWriter.Assert(writer =>
@@ -43,20 +43,20 @@ public class TraceLogTest {
 
   [Fact]
   public void PrintsError() {
-    var formattedTestMsg = Format(_testMsg);
+    var formattedTestMsg = Format(TEST_MSG);
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
-        formatter.FormatError(nameof(TraceLogTest), _testMsg))
+        formatter.FormatError(nameof(TraceLogTest), TEST_MSG))
       .Returns(formattedTestMsg);
 
     var mockWriter = new Mock<TraceLog.IWriter>();
     var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
       Formatter = mockFormatter.Object
     };
-    log.Err(_testMsg);
+    log.Err(TEST_MSG);
 
     mockFormatter.Assert(formatter =>
-        formatter.FormatError(nameof(TraceLogTest), _testMsg),
+        formatter.FormatError(nameof(TraceLogTest), TEST_MSG),
       Invoked.Once);
 
     mockWriter.Assert(writer =>
@@ -66,20 +66,20 @@ public class TraceLogTest {
 
   [Fact]
   public void PrintsWarning() {
-    var formattedTestMsg = Format(_testMsg);
+    var formattedTestMsg = Format(TEST_MSG);
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
-        formatter.FormatWarning(nameof(TraceLogTest), _testMsg))
+        formatter.FormatWarning(nameof(TraceLogTest), TEST_MSG))
       .Returns(formattedTestMsg);
 
     var mockWriter = new Mock<TraceLog.IWriter>();
     var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
       Formatter = mockFormatter.Object
     };
-    log.Warn(_testMsg);
+    log.Warn(TEST_MSG);
 
     mockFormatter.Assert(formatter =>
-        formatter.FormatWarning(nameof(TraceLogTest), _testMsg),
+        formatter.FormatWarning(nameof(TraceLogTest), TEST_MSG),
       Invoked.Once);
 
     mockWriter.Assert(writer =>
@@ -89,7 +89,7 @@ public class TraceLogTest {
 
   [Fact]
   public void PrintsException() {
-    var e = new TestException(_testMsg);
+    var e = new TestException(TEST_MSG);
     var eMsg = e.ToString();
     var formattedExceptionMsg = Format("Exception:");
     var formattedException = Format(eMsg);
