@@ -83,23 +83,16 @@ public sealed class FileLog : ILog {
     /// </summary>
     public string FileName { get; }
 
-    private bool _isCleared;
-
     private Writer(string fileName) {
       FileName = fileName;
+      // Clear the file
+      using var sw = new StreamWriter(FileName);
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style",
       "IDE0063:Use simple 'using' statement",
       Justification = "Prefer block, to explicitly delineate scope")]
     private void WriteLine(string message) {
-      // Clearing the file here, instead of at construction, prevents us from
-      // overwriting files until something's actually logged, and also supports
-      // more testing
-      if (!_isCleared) {
-        using (var sw = new StreamWriter(FileName)) { }
-        _isCleared = true;
-      }
       using (var sw = File.AppendText(FileName)) {
         sw.WriteLine(message);
       }

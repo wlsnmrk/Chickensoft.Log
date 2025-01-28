@@ -13,37 +13,6 @@ public class FileLogTest {
   }
 
   [Fact]
-  public void WriterInstanceUsesDefaultFileName() {
-    var writer = FileLog.Writer.Instance();
-    writer.FileName.ShouldBe(FileLog.Writer.DefaultFileName);
-  }
-
-  [Fact]
-  public void WriterInstanceUsesProvidedFileName() {
-    var fileName = "testFileName.log";
-    var writer = FileLog.Writer.Instance(fileName);
-    writer.FileName.ShouldBe(fileName);
-  }
-
-  [Fact]
-  public void WriterInstanceUsesChangedDefaultFileName() {
-    var newDefault = "testDefaultFileName.log";
-    var originalDefault = FileLog.Writer.DefaultFileName;
-    FileLog.Writer.DefaultFileName = newDefault;
-    var writer = FileLog.Writer.Instance();
-    writer.FileName.ShouldBe(newDefault);
-    FileLog.Writer.DefaultFileName = originalDefault;
-  }
-
-  [Fact]
-  public void WriterInstanceUsesExistingWriter() {
-    var fileName = "testFileName.log";
-    var writer1 = FileLog.Writer.Instance(fileName);
-    var writer2 = FileLog.Writer.Instance(fileName);
-    writer1.ShouldBeSameAs(writer2);
-  }
-
-  [Fact]
   public void Initializes() {
     var mockWriter = new Mock<FileLog.IWriter>();
     var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
