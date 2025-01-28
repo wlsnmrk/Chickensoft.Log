@@ -124,6 +124,57 @@ public class TraceLogTest {
   }
 
   [Fact]
+  [System.Diagnostics.CodeAnalysis.SuppressMessage("Style",
+      "CA1859:Change type of variable for performance",
+      Justification = "Need ILog type to test interface method")]
+  public void PrintsExceptionWithMessage() {
+    var contextMsg = "Context message";
+    var exceptionMsg = "Exception:";
+    var e = new TestException(TEST_MSG);
+    var eStr = e.ToString();
+    var formattedContextMsg = Format(contextMsg);
+    var formattedExceptionMsg = Format(exceptionMsg);
+    var formattedException = Format(eStr);
+
+    var mockFormatter = new Mock<ILogFormatter>();
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), contextMsg))
+      .Returns(formattedContextMsg);
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), exceptionMsg))
+      .Returns(formattedExceptionMsg);
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), eStr))
+      .Returns(formattedException);
+
+    var mockWriter = new Mock<TraceLog.IWriter>();
+    var log = (ILog)new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
+      Formatter = mockFormatter.Object
+    };
+    log.Print(e, contextMsg);
+
+    mockFormatter.Assert(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), contextMsg),
+      Invoked.Once);
+    mockFormatter.Assert(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), exceptionMsg),
+      Invoked.Once);
+    mockFormatter.Assert(formatter =>
+        formatter.FormatError(nameof(TraceLogTest), eStr),
+      Invoked.Once);
+
+    mockWriter.Assert(writer =>
+        writer.WriteError(formattedContextMsg),
+      Invoked.Once);
+    mockWriter.Assert(writer =>
+        writer.WriteError(formattedExceptionMsg),
+      Invoked.Once);
+    mockWriter.Assert(writer =>
+        writer.WriteError(formattedException),
+      Invoked.Once);
+  }
+
+  [Fact]
   public void PrintsStackTrace() {
     var expectedStackTraceMsg = "ClassName.MethodName in File.cs(1,2)";
     var formattedStackTraceMsg = Format(expectedStackTraceMsg);
@@ -138,6 +189,88 @@ public class TraceLogTest {
       Formatter = mockFormatter.Object
     };
     var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
+    log.Print(st);
+
+    mockFormatter.Assert(formatter =>
+        formatter.FormatMessage(nameof(TraceLogTest), expectedStackTraceMsg),
+      Invoked.Once);
+
+    mockWriter.Assert(writer =>
+        writer.WriteMessage(formattedStackTraceMsg),
+      Invoked.Once
+    );
+  }
+
+  [Fact]
+  public void PrintsStackTraceWithoutFile() {
+    var expectedStackTraceMsg = "ClassName.MethodName in **(1,2)";
+    var formattedStackTraceMsg = Format(expectedStackTraceMsg);
+
+    var mockFormatter = new Mock<ILogFormatter>();
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatMessage(nameof(TraceLogTest), expectedStackTraceMsg))
+      .Returns(formattedStackTraceMsg);
+
+    var mockWriter = new Mock<TraceLog.IWriter>();
+    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
+      Formatter = mockFormatter.Object
+    };
+    var st = new FakeStackTrace(null, "ClassName", "MethodName");
+    log.Print(st);
+
+    mockFormatter.Assert(formatter =>
+        formatter.FormatMessage(nameof(TraceLogTest), expectedStackTraceMsg),
+      Invoked.Once);
+
+    mockWriter.Assert(writer =>
+        writer.WriteMessage(formattedStackTraceMsg),
+      Invoked.Once
+    );
+  }
+
+  [Fact]
+  public void PrintsStackTraceWithoutClass() {
+    var expectedStackTraceMsg = "UnknownClass.MethodName in File.cs(1,2)";
+    var formattedStackTraceMsg = Format(expectedStackTraceMsg);
+
+    var mockFormatter = new Mock<ILogFormatter>();
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatMessage(nameof(TraceLogTest), expectedStackTraceMsg))
+      .Returns(formattedStackTraceMsg);
+
+    var mockWriter = new Mock<TraceLog.IWriter>();
+    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
+      Formatter = mockFormatter.Object
+    };
+    var st = new FakeStackTrace("File.cs", null, "MethodName");
+    log.Print(st);
+
+    mockFormatter.Assert(formatter =>
+        formatter.FormatMessage(nameof(TraceLogTest), expectedStackTraceMsg),
+      Invoked.Once);
+
+    mockWriter.Assert(writer =>
+        writer.WriteMessage(formattedStackTraceMsg),
+      Invoked.Once
+    );
+  }
+
+  [Fact]
+  public void PrintsStackTraceWithoutMethod() {
+    // unknown method is also unknown class
+    var expectedStackTraceMsg = "UnknownClass.UnknownMethod in File.cs(1,2)";
+    var formattedStackTraceMsg = Format(expectedStackTraceMsg);
+
+    var mockFormatter = new Mock<ILogFormatter>();
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatMessage(nameof(TraceLogTest), expectedStackTraceMsg))
+      .Returns(formattedStackTraceMsg);
+
+    var mockWriter = new Mock<TraceLog.IWriter>();
+    var log = new TraceLog(nameof(TraceLogTest), mockWriter.Object) {
+      Formatter = mockFormatter.Object
+    };
+    var st = new FakeStackTrace("File.cs", "ClassName", null);
     log.Print(st);
 
     mockFormatter.Assert(formatter =>

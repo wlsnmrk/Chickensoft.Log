@@ -59,8 +59,6 @@ public sealed class FileLog : ILog {
       if (_instances.TryGetValue(fileName, out var writer)) {
         return writer;
       }
-      // Clear the file
-      using (var sw = new StreamWriter(fileName)) { }
       writer = new Writer(fileName);
       _instances[fileName] = writer;
       return writer;
@@ -80,17 +78,29 @@ public sealed class FileLog : ILog {
       return Instance(DefaultFileName);
     }
 
-    private readonly string _fileName;
+    /// <summary>
+    /// The path of the filename this Writer is writing to.
+    /// </summary>
+    public string FileName { get; }
+
+    private bool _isCleared;
 
     private Writer(string fileName) {
-      _fileName = fileName;
+      FileName = fileName;
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style",
       "IDE0063:Use simple 'using' statement",
       Justification = "Prefer block, to explicitly delineate scope")]
     private void WriteLine(string message) {
-      using (var sw = File.AppendText(_fileName)) {
+      // Clearing the file here, instead of at construction, prevents us from
+      // overwriting files until something's actually logged, and also supports
+      // more testing
+      if (!_isCleared) {
+        using (var sw = new StreamWriter(FileName)) { }
+        _isCleared = true;
+      }
+      using (var sw = File.AppendText(FileName)) {
         sw.WriteLine(message);
       }
     }
