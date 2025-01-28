@@ -38,7 +38,7 @@ public interface ILog {
   /// <param name="e">Exception to print.</param>
   /// <param name="message">Message to output.</param>
   public void Print(Exception e, string message) {
-    Print(message);
+    Err(message);
     Print(e);
   }
 
