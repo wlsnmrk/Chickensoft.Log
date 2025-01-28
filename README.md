@@ -33,18 +33,6 @@ public class MyClass
 }
 ```
 
-Optionally, you can provide an `ILogFormatter` that the log will use to format its name, the level of the log message, and the log message itself. (By default, logs included with the package will use the standard `LogFormatter`.)
-
-```csharp
-public class MyClass
-{
-  private ILog _log = new ConsoleLog(nameof(MyClass))
-  {
-    Formatter = new MyFormatter()
-  };
-}
-```
-
 ### Logging
 
 ```csharp
@@ -66,6 +54,20 @@ public void MyMethod()
 ```
 
 ### Formatting
+
+Optionally, when constructing a log, you can provide an `ILogFormatter` that the log will use to format the components of each log message (the log's name, the level of the message, and the message itself).
+
+```csharp
+public class MyClass
+{
+  private ILog _log = new ConsoleLog(nameof(MyClass))
+  {
+    Formatter = new MyFormatter()
+  };
+}
+```
+
+By default, logs included with the package will use a standard `LogFormatter` class implementing `ILogFormatter`.
 
 Messages are formatted with one of three level labels, depending which log method you call. By default, the included `LogFormatter` uses the labels `"Info"`, `"Warn"`, and `"Error"`. You can change these labels for an individual `LogFormatter`:
 
@@ -100,7 +102,7 @@ The package provides one additional, non-operational log type, `TestLog`, which 
 
 ### Using `FileLog`
 
-Create a log that outputs messages to the default filename `"output.log"`:
+Create a log that outputs messages to the default file name `"output.log"`:
 
 ```csharp
 public class MyClass
@@ -110,7 +112,7 @@ public class MyClass
 ```
 
 ---
-Create a log that outputs messages to a custom filename:
+Create a log that outputs messages to a custom file name:
 
 ```csharp
 public class MyClass
@@ -120,14 +122,14 @@ public class MyClass
 ```
 
 ---
-Change the default filename for `FileLog`s:
+Change the default file name for `FileLog`s:
 
 ```csharp
 public class Entry
 {
   public static void Main()
   {
-    // Change the default filename for FileLog before any logs are created
+    // Change the default file name for FileLog before any logs are created
     FileLog.Writer.DefaultFileName = "MyFileName.log";
   }
 }
@@ -137,6 +139,9 @@ public class MyClass
   private ILog _log = new FileLog(nameof(MyClass));
 }
 ```
+
+> [!WARNING]
+> Changing the default value for the log file name will affect newly-created `FileLog`s, but will not affect ones that already exist.
 
 ### Using `TestLog`
 
