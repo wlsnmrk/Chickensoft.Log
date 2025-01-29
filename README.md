@@ -102,7 +102,7 @@ the log's name, the level of the message, and the message itself.)
 ```csharp
 public class MyClass
 {
-  private ILog _log = new Log(nameof(MyClass), [ConsoleWriter()])
+  private ILog _log = new Log(nameof(MyClass), [new ConsoleWriter()])
   {
     Formatter = new MyFormatter()
   };
