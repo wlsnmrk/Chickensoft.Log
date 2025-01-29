@@ -1,5 +1,8 @@
 namespace Chickensoft.Log;
 
+using System.Diagnostics;
+using System.Text;
+
 /// <summary>
 /// The default <see cref="ILogFormatter"/> for logs in Chickensoft.Log.
 /// Provides a simple formatting structure of "LEVEL (NAME): MESSAGE", where:
@@ -66,6 +69,24 @@ public class LogFormatter : ILogFormatter {
   /// <inheritdoc/>
   public string FormatMessage(string logName, string message) {
     return Format(MessagePrefix, logName, message);
+  }
+
+  /// <inheritdoc/>
+  public string FormatMessage(string logName, StackTrace stackTrace) {
+    var sb = new StringBuilder();
+    foreach (var frame in stackTrace.GetFrames()) {
+      var fileName = frame.GetFileName() ?? "**";
+      var lineNumber = frame.GetFileLineNumber();
+      var colNumber = frame.GetFileColumnNumber();
+      var method = frame.GetMethod();
+      var className = method?.DeclaringType?.Name ?? "UnknownClass";
+      var methodName = method?.Name ?? "UnknownMethod";
+      sb.AppendLine(
+        $"{className}.{methodName} in " +
+          $"{fileName}({lineNumber},{colNumber})"
+      );
+    }
+    return Format(MessagePrefix, logName, sb.ToString().Trim());
   }
 
   /// <inheritdoc/>

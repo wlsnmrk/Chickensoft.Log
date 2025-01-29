@@ -28,27 +28,31 @@ Install the latest version of the [Chickensoft.Log] package from nuget:
 
 ## 🪵 Usage
 
-### Setting up a Log
+### Essentials
 
 In Chickensoft.Log, messages are logged through the `ILog` interface. Each `ILog`
-has a name (often the name of the class using the `ILog`) and a list of
-`ILogWriter`s that are responsible for directing log messages to their respective
-outputs. The package includes a standard implementation of `ILog`, named `Log`.
-(More on writers below.)
+has a name (often the name of the class using the `ILog`), an `ILogFormatter` for
+formatting messages, and a collection of `ILogWriter`s, each responsible for
+directing log messages to one output.
 
-Example of creating an `ILog`:
+### Setting up a Log
+
+The package includes a standard implementation of `ILog`, named `Log`. To create
+a log, instantiate a `Log` and give it a name and at least one writer.
+
+Example:
 
 ```csharp
 public class MyClass
 {
-  // Create a log, with the name of MyClass, that outputs messages to stdout/stderr
-  private ILog _log = new Log(nameof(MyClass), [ConsoleWriter.Instance()]);
+  // Create a log with the name of MyClass, outputting to stdout/stderr
+  private ILog _log = new Log(nameof(MyClass), [new ConsoleWriter()]);
 }
 ```
 
 ### Logging
 
-To log messages, you use `ILog`'s methods `Print()`, `Warn()`, and `Err()`.
+To log messages, use `ILog`'s methods `Print()`, `Warn()`, and `Err()`.
 
 Example:
 
@@ -76,7 +80,6 @@ public class MyClass
     }
 
     // Outputs the current stack trace as a standard log message
-    _log.Print("An event occurred at:");
     _log.Print(new System.Diagnostics.StackTrace());
   }
 }
@@ -85,13 +88,14 @@ public class MyClass
 > [!TIP]
 > Some writers may have separate channels for warnings and errors, while others
 > may not. For instance, the `TraceWriter` has separate channels for regular log
-> messages, warnings, and errors. The `FileWriter` has only one channel, to the
-> file it's writing to.
+> messages, warnings, and errors. The `FileWriter` has only one channel, the
+> file it's writing to. Warnings and errors can still be distinguished by the
+> label the formatter gives them.
 
 ### Formatting
 
 Optionally, when constructing a log, you can provide an `ILogFormatter` that the
-log will use to format the components of each log message. (Those components are
+log will use to format each log message. (The formatted message should include
 the log's name, the level of the message, and the message itself.)
 
 ```csharp
@@ -104,8 +108,8 @@ public class MyClass
 }
 ```
 
-By default, logs included with the package will use a standard `LogFormatter`
-class implementing `ILogFormatter`.
+By default, `Log` will use the included `LogFormatter` class implementing
+`ILogFormatter`.
 
 Messages are formatted with one of three level labels, depending which log method
 you call. By default, the included `LogFormatter` uses the labels `"Info"`,
@@ -134,34 +138,29 @@ LogFormatter.DefaultErrorPrefix = "ERROR";
 
 ## ✒️ Writer Types
 
-`Log` accepts a list of writers to which the log will direct formatted messages.
-The writers are responsible for handling the output of the messages. The Log
-package provides three operational writer types implementing the `ILogWriter`
-interface:
+`Log` accepts a list of writers, which receive formatted messages from the log
+and are responsible for handling the output of the messages. The Log package
+provides three writer types for use in applications or libraries:
 
 * `ConsoleWriter`: Outputs log messages to stdout and stderr.
 * `TraceWriter`: Outputs log messages to .NET's `Trace` system. This is useful
 for seeing log output in Visual Studio's "Output" tab while debugging.
-* `FileWriter`: Outputs log messages to file. By default, `FileWriter`s will
+* `FileWriter`: Outputs log messages to file. By default, `FileWriter` will
 write to a file called "output.log" in the working directory, but you can either
 configure a different default, or configure individual `FileWriter`s to write to
-particular files on creation.
-
-To provide thread safety such that only one message may be written at a time,
-`ConsoleWriter` and `TraceWriter` are implemented as singletons that may be
-obtained using the static method `Instance()`. `FileWriter` is implemented as a
-pseudo-singleton with a single instance per file name; see below for details.
+particular files on creation. To avoid concurrency issues, `FileWriter` is
+implemented as a pseudo-singleton with a single instance per file name; see
+below for details.
 
 The package provides one additional writer type, `TestWriter`, which may be
 useful for testing your code without mocking `ILog` (see below).
 
 ### Using `FileWriter`
 
-`FileWriter` provides a static `Instance()` method that returns one unique
-writer per file name.
+`FileWriter` provides two static `Instance()` methods for obtaining references
+to writers.
 
-You can obtain a reference to a writer that outputs messages to the default file
-name `"output.log"`:
+You can obtain a reference to a writer using the default file name `"output.log"`:
 
 ```csharp
 public class MyClass
@@ -171,7 +170,7 @@ public class MyClass
 ```
 
 ---
-You can create a writer that outputs messages to a custom file name:
+You can obtain a writer that outputs messages to a custom file name:
 
 ```csharp
 public class MyClass
@@ -181,7 +180,7 @@ public class MyClass
 ```
 
 ---
-You can change the default file name for `FileWriter`s:
+And you can change the default file name for `FileWriter`s:
 
 ```csharp
 public class Entry
@@ -203,7 +202,7 @@ public class MyClass
 
 > [!WARNING]
 > Changing the default value for the log file name will affect newly-created
-> `FileLog`s, but will not affect ones that already exist.
+> `FileWriter`s, but will not affect ones that already exist.
 
 ### Using `TestWriter`
 
@@ -244,6 +243,9 @@ public class MyClassTest
   }
 }
 ```
+
+> [!WARNING]
+> `TestWriter` is not thread-safe.
 
 ## 💁 Getting Help
 

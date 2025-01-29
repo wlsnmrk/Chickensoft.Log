@@ -8,29 +8,18 @@ using System.Diagnostics;
 /// The standard implementation of <see cref="ILog"/>.
 /// </summary>
 public sealed class Log : ILog {
+  private readonly object _writersLock = new();
+
   /// <inheritdoc/>
   public string Name { get; }
 
-  /// <inheritdoc/>
-  public IList<ILogWriter> Writers { get; } = [];
+  private readonly List<ILogWriter> _writers = [];
 
   /// <summary>
   /// The formatter that will be used to format messages before writing them
   /// to the console. Defaults to an instance of <see cref="LogFormatter"/>.
   /// </summary>
   public ILogFormatter Formatter { get; set; } = new LogFormatter();
-
-  /// <summary>
-  /// Initialize an empty Log (i.e., with no writers).
-  /// </summary>
-  /// <param name="name">
-  /// The name associated with this log. Will be included in messages directed
-  /// through this log (see <see cref="Name"/>).
-  /// A common value is <c>nameof(EncapsulatingClass)</c>.
-  /// </param>
-  public Log(string name) {
-    Name = name;
-  }
 
   /// <summary>
   /// Initialize a Log that will use the provided writers.
@@ -43,52 +32,90 @@ public sealed class Log : ILog {
   /// <param name="writers">Writers this log will use to write messages.</param>
   public Log(string name, IList<ILogWriter> writers) {
     Name = name;
-    Writers = [.. writers];
+    _writers = [.. writers];
+  }
+
+  /// <inheritdoc/>
+  public void AddWriter(ILogWriter writer) {
+    lock (_writersLock) {
+      if (!_writers.Contains(writer)) {
+        _writers.Add(writer);
+      }
+    }
+  }
+
+  /// <inheritdoc/>
+  public void RemoveWriter(ILogWriter writer) {
+    lock (_writersLock) {
+      _writers.Remove(writer);
+    }
   }
 
   /// <inheritdoc/>
   public void Print(string message) {
     var formatted = Formatter.FormatMessage(Name, message);
-    foreach (var writer in Writers) {
-      writer.WriteMessage(formatted);
+    lock (_writersLock) {
+      foreach (var writer in _writers) {
+        writer.WriteMessage(formatted);
+      }
     }
   }
 
   /// <inheritdoc/>
   public void Print(StackTrace stackTrace) {
-    foreach (var frame in stackTrace.GetFrames()) {
-      var fileName = frame.GetFileName() ?? "**";
-      var lineNumber = frame.GetFileLineNumber();
-      var colNumber = frame.GetFileColumnNumber();
-      var method = frame.GetMethod();
-      var className = method?.DeclaringType?.Name ?? "UnknownClass";
-      var methodName = method?.Name ?? "UnknownMethod";
-      Print(
-        $"{className}.{methodName} in " +
-        $"{fileName}({lineNumber},{colNumber})"
-      );
+    var formatted = Formatter.FormatMessage(Name, stackTrace);
+    lock (_writersLock) {
+      foreach (var writer in _writers) {
+        writer.WriteMessage(formatted);
+      }
+    }
+  }
+
+  /// <inheritdoc/>
+  public void Print(StackTrace stackTrace, string message) {
+    var formattedStackTrace = Formatter.FormatMessage(Name, stackTrace);
+    var formattedMessage = Formatter.FormatMessage(Name, message);
+    lock (_writersLock) {
+      foreach (var writer in _writers) {
+        writer.WriteMessage(formattedMessage);
+        writer.WriteMessage(formattedStackTrace);
+      }
     }
   }
 
   /// <inheritdoc/>
   public void Print(Exception e) {
-    Err("Exception:");
-    Err(e.ToString());
+    lock (_writersLock) {
+      Err("Exception:");
+      Err(e.ToString());
+    }
+  }
+
+  /// <inheritdoc/>
+  public void Print(Exception e, string message) {
+    lock (_writersLock) {
+      Err(message);
+      Print(e);
+    }
   }
 
   /// <inheritdoc/>
   public void Warn(string message) {
     var formatted = Formatter.FormatWarning(Name, message);
-    foreach (var writer in Writers) {
-      writer.WriteWarning(formatted);
+    lock (_writersLock) {
+      foreach (var writer in _writers) {
+        writer.WriteWarning(formatted);
+      }
     }
   }
 
   /// <inheritdoc/>
   public void Err(string message) {
     var formatted = Formatter.FormatError(Name, message);
-    foreach (var writer in Writers) {
-      writer.WriteError(formatted);
+    lock (_writersLock) {
+      foreach (var writer in _writers) {
+        writer.WriteError(formatted);
+      }
     }
   }
 }

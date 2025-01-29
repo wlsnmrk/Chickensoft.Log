@@ -1,5 +1,7 @@
 namespace Chickensoft.Log;
 
+using System.Diagnostics;
+
 /// <summary>
 /// Optional interface providing log-message formatting to <see cref="ILog"/>.
 /// </summary>
@@ -8,8 +10,7 @@ public interface ILogFormatter {
   /// Formats a standard informational log message.
   /// </summary>
   /// <param name="logName">
-  /// The name of the log from which the message
-  /// originates.
+  /// The name of the log from which the message originates.
   /// </param>
   /// <param name="message">The log message to format.</param>
   /// <returns>
@@ -17,6 +18,19 @@ public interface ILogFormatter {
   /// the log level.
   /// </returns>
   public string FormatMessage(string logName, string message);
+
+  /// <summary>
+  /// Formats a single, multi-line informational log message for a stack trace.
+  /// </summary>
+  /// <param name="logName">
+  /// The name of the log from which the message originates.
+  /// </param>
+  /// <param name="stackTrace">The stack trace to format.</param>
+  /// <returns>
+  /// A formatted version of the stack trace including the log name and
+  /// the log level on each line.
+  /// </returns>
+  public string FormatMessage(string logName, StackTrace stackTrace);
 
   /// <summary>
   /// Formats a warning message.

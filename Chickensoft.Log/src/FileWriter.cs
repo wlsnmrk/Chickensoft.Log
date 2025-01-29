@@ -1,12 +1,14 @@
 namespace Chickensoft.Log;
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 /// <summary>
 /// An <see cref="ILogWriter"/> that directs output of an <see cref="ILog"/>
 /// to a file.
 /// </summary>
+[ExcludeFromCodeCoverage(Justification = "File output is untestable")]
 public sealed class FileWriter : ILogWriter {
   // protect static members from simultaneous thread access
   private static readonly object _singletonLock = new();
@@ -99,7 +101,7 @@ public sealed class FileWriter : ILogWriter {
     }
   }
 
-  [System.Diagnostics.CodeAnalysis.SuppressMessage("Style",
+  [SuppressMessage("Style",
     "IDE0063:Use simple 'using' statement",
     Justification = "Prefer block, to explicitly delineate scope")]
   private void WriteLine(string message) {

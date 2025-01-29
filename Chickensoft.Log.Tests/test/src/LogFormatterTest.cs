@@ -23,6 +23,39 @@ public class LogFormatterTest {
   }
 
   [Fact]
+  public void FormatsStackTrace() {
+    var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
+    var formatter = new LogFormatter();
+    formatter.FormatMessage(_testName, st)
+      .ShouldBe($"Info ({_testName}): ClassName.MethodName in File.cs(1,2)");
+  }
+
+  [Fact]
+  public void FormatsStackTraceWithoutFile() {
+    var st = new FakeStackTrace(null, "ClassName", "MethodName");
+    var formatter = new LogFormatter();
+    formatter.FormatMessage(_testName, st)
+      .ShouldBe($"Info ({_testName}): ClassName.MethodName in **(1,2)");
+  }
+
+  [Fact]
+  public void FormatsStackTraceWithoutClass() {
+    var st = new FakeStackTrace("File.cs", null, "MethodName");
+    var formatter = new LogFormatter();
+    formatter.FormatMessage(_testName, st)
+      .ShouldBe($"Info ({_testName}): UnknownClass.MethodName in File.cs(1,2)");
+  }
+
+  [Fact]
+  public void FormatsStackTraceWithoutMethod() {
+    var st = new FakeStackTrace("File.cs", "ClassName", null);
+    var formatter = new LogFormatter();
+    // unknown method is also unknown class
+    formatter.FormatMessage(_testName, st)
+      .ShouldBe($"Info ({_testName}): UnknownClass.UnknownMethod in File.cs(1,2)");
+  }
+
+  [Fact]
   public void FormatsWarning() {
     var formatter = new LogFormatter();
     formatter.FormatWarning(_testName, _testMsg)
