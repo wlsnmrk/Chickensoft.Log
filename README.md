@@ -1,8 +1,13 @@
 # Chickensoft.Log
 
-[![Chickensoft Badge][chickensoft-badge]][chickensoft-website] [![Discord][discord-badge]][discord] [![Read the docs][read-the-docs-badge]][docs] ![line coverage][line-coverage] ![branch coverage][branch-coverage]
+[![Chickensoft Badge][chickensoft-badge]][chickensoft-website]
+[![Discord][discord-badge]][discord]
+[![Read the docs][read-the-docs-badge]][docs]
+![line coverage][line-coverage]
+![branch coverage][branch-coverage]
 
-Opinionated, simple logging interface and implementations for C# applications and libraries. Forms the basis for [Log.Godot][log-godot].
+Opinionated logging interface and implementations for C# applications
+and libraries.
 
 ---
 
@@ -21,64 +26,106 @@ Install the latest version of the [Chickensoft.Log] package from nuget:
 <PackageReference Include="Chickensoft.Log" Version=... />
 ```
 
-## 📜 Usage
+## 🪵 Usage
 
-### Setup
+### Essentials
+
+In Chickensoft.Log, messages are logged through the `ILog` interface. Each `ILog`
+has a name (often the name of the class using the `ILog`), an `ILogFormatter` for
+formatting messages, and a collection of `ILogWriter`s, each responsible for
+directing log messages to one output.
+
+### Setting up a Log
+
+The package includes a standard implementation of `ILog`, named `Log`. To create
+a log, instantiate a `Log` and give it a name and at least one writer.
+
+Example:
 
 ```csharp
 public class MyClass
 {
-  // Create a log that outputs messages to stdout/stderr, prefixed with the name of the class.
-  private ILog _log = new ConsoleLog(nameof(MyClass));
+  // Create a log with the name of MyClass, outputting to stdout/stderr
+  private ILog _log = new Log(nameof(MyClass), [new ConsoleWriter()]);
 }
 ```
 
 ### Logging
 
-```csharp
-public void MyMethod()
-{
-  _log.Print("A log message"); // Outputs "Info (MyClass): A log message"
-  _log.Warn("A warning message"); // Outputs "Warn (MyClass): A warning message"
-  _log.Err("An error occurred"); // Outputs "Error (MyClass): An error occurred"
-  try
-  {
-    SomethingThatThrows();
-  }
-  catch (Exception e)
-  {
-    _log.Print(e); // Outputs the value of e.ToString(), prefixed by a line labeling it as an exception
-    // ...
-  }
-}
-```
+To log messages, use `ILog`'s methods `Print()`, `Warn()`, and `Err()`.
 
-### Formatting
-
-Optionally, when constructing a log, you can provide an `ILogFormatter` that the log will use to format the components of each log message (the log's name, the level of the message, and the message itself).
+Example:
 
 ```csharp
 public class MyClass
 {
-  private ILog _log = new ConsoleLog(nameof(MyClass))
+  public void MyMethod()
+  {
+    // Outputs "Info (MyClass): A log message"
+    _log.Print("A log message");
+    // Outputs "Warn (MyClass): A warning message"
+    _log.Warn("A warning message");
+    // Outputs "Error (MyClass): An error occurred"
+    _log.Err("An error occurred");
+
+    try
+    {
+      SomethingThatThrows();
+    }
+    catch (Exception e)
+    {
+      // Outputs the value of e.ToString(), prefixed by a line labeling it an exception,
+      // as an error
+      _log.Print(e);
+    }
+
+    // Outputs the current stack trace as a standard log message
+    _log.Print(new System.Diagnostics.StackTrace());
+  }
+}
+```
+
+> [!TIP]
+> Some writers may have separate channels for warnings and errors, while others
+> may not. For instance, the `TraceWriter` has separate channels for regular log
+> messages, warnings, and errors. The `FileWriter` has only one channel, the
+> file it's writing to. Warnings and errors can still be distinguished by the
+> label the formatter gives them, even if directed to the same channel as regular
+> log messages.
+
+### Formatting
+
+Optionally, when constructing a log, you can provide an `ILogFormatter` that the
+log will use to format each message. (The formatted message should include
+the log's name, the level of the message, and the message itself.)
+
+```csharp
+public class MyClass
+{
+  private ILog _log = new Log(nameof(MyClass), [new ConsoleWriter()])
   {
     Formatter = new MyFormatter()
   };
 }
 ```
 
-By default, logs included with the package will use a standard `LogFormatter` class implementing `ILogFormatter`.
+By default, `Log` will use the included `LogFormatter` class implementing
+`ILogFormatter`.
 
-Messages are formatted with one of three level labels, depending which log method you call. By default, the included `LogFormatter` uses the labels `"Info"`, `"Warn"`, and `"Error"`. You can change these labels for an individual `LogFormatter`:
+Messages are formatted with one of three level labels, depending which log method
+you call. By default, the included `LogFormatter` uses the labels `"Info"`,
+`"Warn"`, and `"Error"`. You can change these labels for an individual `LogFormatter`:
 
 ```csharp
-var formatter = new LogFormatter();
-formatter.MessagePrefix = "INFO";
-formatter.WarningPrefix = "WARN";
-formatter.ErrorPrefix = "ERROR";
+var formatter = new LogFormatter()
+{
+  MessagePrefix = "INFO";
+  WarningPrefix = "WARN";
+  ErrorPrefix = "ERROR";
+};
 ```
 
-You can also change the default values for these labels:
+You can also change the default values of these labels for all `LogFormatter`s:
 
 ```csharp
 LogFormatter.DefaultMessagePrefix = "INFO";
@@ -87,71 +134,90 @@ LogFormatter.DefaultErrorPrefix = "ERROR";
 ```
 
 > [!WARNING]
-> Changing the default values for the level labels will affect newly-created `LogFormatter`s, but will not affect ones that already exist.
+> Changing the default values of the level labels will affect newly-created
+> `LogFormatter`s, but will not affect ones that already exist.
 
-## 🪵 Log Types
+## ✒️ Writer Types
 
-The Log package provides four operational log types implementing the `ILog` interface:
+`Log` accepts a list of writers, which receive formatted messages from the log
+and are responsible for handling the output of the messages. The Log package
+provides three writer types for use in applications or libraries:
 
-* `ConsoleLog`: Outputs log messages to stdout/stderr.
-* `TraceLog`: Outputs log messages to .NET's `Trace` system. This is useful for seeing log output in Visual Studio's "Output" tab while debugging.
-* `FileLog`: Outputs log messages to file. All `FileLog`s will write to a file called "output.log" in the working directory by default, but you can either configure a different default, or configure individual `FileLog`s to write to particular files on creation.
-* `MultiLog`: Delegates log messages to multiple other logs, allowing you to log the same message to, e.g., stdout/stderr and to file with one method call.
+* `ConsoleWriter`: Outputs log messages to stdout and stderr.
+* `TraceWriter`: Outputs log messages to .NET's `Trace` system. This is useful
+for seeing log output in Visual Studio's "Output" tab while debugging.
+* `FileWriter`: Outputs log messages to file. By default, `FileWriter` will
+write to a file called "output.log" in the working directory, but you can either
+configure a different default, or configure individual `FileWriter`s to write to
+particular files on creation. To avoid concurrency issues, `FileWriter` is
+implemented as a pseudo-singleton with a single instance per file name; see
+below for details.
 
-The package provides one additional, non-operational log type, `TestLog`, which may be useful for testing your code without mocking `ILog`.
+The package provides one additional writer type, `TestWriter`, which may be
+useful for testing your code without mocking `ILog` (see below).
 
-### Using `FileLog`
+### Using `FileWriter`
 
-Create a log that outputs messages to the default file name `"output.log"`:
+`FileWriter` provides two static `Instance()` methods for obtaining references
+to writers.
+
+You can obtain a reference to a writer using the default file name `"output.log"`:
 
 ```csharp
 public class MyClass
 {
-  private ILog _log = new FileLog(nameof(MyClass));
+  private ILog _log = new Log(nameof(MyClass), [FileWriter.Instance()]);
 }
 ```
 
 ---
-Create a log that outputs messages to a custom file name:
+You can obtain a writer that outputs messages to a custom file name:
 
 ```csharp
 public class MyClass
 {
-  private ILog _log = new FileLog(nameof(MyClass), "CustomFileName.log");
+  private ILog _log = new Log(nameof(MyClass), [FileWriter.Instance("CustomFileName.log")];
 }
 ```
 
 ---
-Change the default file name for `FileLog`s:
+And you can change the default file name for `FileWriter`s:
 
 ```csharp
 public class Entry
 {
   public static void Main()
   {
-    // Change the default file name for FileLog before any logs are created
-    FileLog.Writer.DefaultFileName = "MyFileName.log";
+    // Change the default file name for FileWriter before any writers are created
+    FileWriter.DefaultFileName = "MyFileName.log";
+    // ...
   }
 }
 
 public class MyClass
 {
-  private ILog _log = new FileLog(nameof(MyClass));
+  // Create a FileWriter that writes to the new default name
+  private ILog _log = new Log(nameof(MyClass), [FileWriter.Instance()]);
 }
 ```
 
 > [!WARNING]
-> Changing the default value for the log file name will affect newly-created `FileLog`s, but will not affect ones that already exist.
+> Changing the default value for the log file name will affect newly-created
+> `FileWriter`s, but will not affect ones that already exist.
 
-### Using `TestLog`
+### Using `TestWriter`
 
-When testing code that uses an `ILog`, it may be cumbersome to mock `ILog`'s methods. In that case, you may prefer to use the provided `TestLog` type, which accumulates log messages for testing:
+When testing code that uses an `ILog`, it may be cumbersome to mock `ILog`'s
+methods. In that case, you may prefer to use the provided `TestWriter` type,
+which accumulates log messages for testing:
 
 ```csharp
+// Class under test
 public class MyClass
 {
-  public ILog Log { get; set; } = new ConsoleLog();
+  public ILog Log { get; set; } = new Log(nameof(MyClass), [new ConsoleWriter()]);
 
+  // Method that logs some information; we want to test the logged messages
   public void MyMethod()
   {
     Log.Print("A normal log message");
@@ -164,18 +230,23 @@ public class MyClassTest
   [Fact]
   public void MyMethodLogs()
   {
-    var obj = new MyClass() { Log = new TestLog() };
+    // set up an instance of MyClass, but with a TestWriter instead of a ConsoleWriter
+    var testWriter = new TestWriter();
+    var obj = new MyClass() { Log = new Log(nameof(MyClass), [testWriter]) };
     obj.MyMethod();
-    obj.Log.LoggedMessages.Count.ShouldBe(2);
-    obj.Log.LoggedMessages[0].ShouldBe("Info (Test): A normal log message");
-    obj.Log.LoggedMessages[1].ShouldBe("Error (Test): An error message");
+    // use TestWriter to test the logging behavior of MyClass
+    testWriter.LoggedMessages
+      .ShouldBeEquivalentTo(new List<string>
+        {
+          "Info (MyClass): A normal log message",
+          "Error (MyClass): An error message"
+        });
   }
 }
 ```
 
-## ✋ Intentional Limitations
-
-The Log package does not provide thread safety. If you are using the Log package in a multithreaded environment, please be sure to employ thread-safe access to your log objects (especially if using multiple `FileLog`s).
+> [!WARNING]
+> `TestWriter` is not thread-safe.
 
 ## 💁 Getting Help
 

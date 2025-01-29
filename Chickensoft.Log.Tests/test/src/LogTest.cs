@@ -1,22 +1,22 @@
 namespace Chickensoft.Log.Tests;
 
-using Chickensoft.Log;
 using LightMock;
 using LightMock.Generator;
 using Shouldly;
 
-public class FileLogTest {
+public class LogTest {
   private const string TEST_MSG = "A test message";
 
   private static string Format(string msg) {
-    return $"MockLevel ({nameof(FileLogTest)}): {msg}";
+    return $"MockLevel ({nameof(LogTest)}): {msg}";
   }
 
   [Fact]
   public void Initializes() {
-    var mockWriter = new Mock<FileLog.IWriter>();
-    var log = new FileLog(nameof(FileLogTest), mockWriter.Object);
+    var mockWriter = new Mock<ILogWriter>();
+    var log = new Log(nameof(LogTest), [mockWriter.Object]);
     log.ShouldBeAssignableTo<ILog>();
+    log.Name.ShouldBe(nameof(LogTest));
   }
 
   [Fact]
@@ -24,17 +24,17 @@ public class FileLogTest {
     var formattedTestMsg = Format(TEST_MSG);
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
-        formatter.FormatMessage(nameof(FileLogTest), TEST_MSG))
+        formatter.FormatMessage(nameof(LogTest), TEST_MSG))
       .Returns(formattedTestMsg);
 
-    var mockWriter = new Mock<FileLog.IWriter>();
-    var log = new FileLog(nameof(FileLogTest), mockWriter.Object) {
+    var mockWriter = new Mock<ILogWriter>();
+    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
       Formatter = mockFormatter.Object
     };
     log.Print(TEST_MSG);
 
     mockFormatter.Assert(formatter =>
-        formatter.FormatMessage(nameof(FileLogTest), TEST_MSG),
+        formatter.FormatMessage(nameof(LogTest), TEST_MSG),
       Invoked.Once);
 
     mockWriter.Assert(writer =>
@@ -47,17 +47,17 @@ public class FileLogTest {
     var formattedTestMsg = Format(TEST_MSG);
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
-        formatter.FormatError(nameof(FileLogTest), TEST_MSG))
+        formatter.FormatError(nameof(LogTest), TEST_MSG))
       .Returns(formattedTestMsg);
 
-    var mockWriter = new Mock<FileLog.IWriter>();
-    var log = new FileLog(nameof(FileLogTest), mockWriter.Object) {
+    var mockWriter = new Mock<ILogWriter>();
+    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
       Formatter = mockFormatter.Object
     };
     log.Err(TEST_MSG);
 
     mockFormatter.Assert(formatter =>
-        formatter.FormatError(nameof(FileLogTest), TEST_MSG),
+        formatter.FormatError(nameof(LogTest), TEST_MSG),
       Invoked.Once);
 
     mockWriter.Assert(writer =>
@@ -70,17 +70,17 @@ public class FileLogTest {
     var formattedTestMsg = Format(TEST_MSG);
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
-        formatter.FormatWarning(nameof(FileLogTest), TEST_MSG))
+        formatter.FormatWarning(nameof(LogTest), TEST_MSG))
       .Returns(formattedTestMsg);
 
-    var mockWriter = new Mock<FileLog.IWriter>();
-    var log = new FileLog(nameof(FileLogTest), mockWriter.Object) {
+    var mockWriter = new Mock<ILogWriter>();
+    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
       Formatter = mockFormatter.Object
     };
     log.Warn(TEST_MSG);
 
     mockFormatter.Assert(formatter =>
-        formatter.FormatWarning(nameof(FileLogTest), TEST_MSG),
+        formatter.FormatWarning(nameof(LogTest), TEST_MSG),
       Invoked.Once);
 
     mockWriter.Assert(writer =>
@@ -97,23 +97,23 @@ public class FileLogTest {
 
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
-        formatter.FormatError(nameof(FileLogTest), "Exception:"))
+        formatter.FormatError(nameof(LogTest), "Exception:"))
       .Returns(formattedExceptionMsg);
     mockFormatter.Arrange(formatter =>
-        formatter.FormatError(nameof(FileLogTest), eMsg))
+        formatter.FormatError(nameof(LogTest), eMsg))
       .Returns(formattedException);
 
-    var mockWriter = new Mock<FileLog.IWriter>();
-    var log = new FileLog(nameof(FileLogTest), mockWriter.Object) {
+    var mockWriter = new Mock<ILogWriter>();
+    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
       Formatter = mockFormatter.Object
     };
     log.Print(e);
 
     mockFormatter.Assert(formatter =>
-        formatter.FormatError(nameof(FileLogTest), "Exception:"),
+        formatter.FormatError(nameof(LogTest), "Exception:"),
       Invoked.Once);
     mockFormatter.Assert(formatter =>
-        formatter.FormatError(nameof(FileLogTest), eMsg),
+        formatter.FormatError(nameof(LogTest), eMsg),
       Invoked.Once);
 
     mockWriter.Assert(writer =>
@@ -139,29 +139,29 @@ public class FileLogTest {
 
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
-        formatter.FormatError(nameof(FileLogTest), contextMsg))
+        formatter.FormatError(nameof(LogTest), contextMsg))
       .Returns(formattedContextMsg);
     mockFormatter.Arrange(formatter =>
-        formatter.FormatError(nameof(FileLogTest), exceptionMsg))
+        formatter.FormatError(nameof(LogTest), exceptionMsg))
       .Returns(formattedExceptionMsg);
     mockFormatter.Arrange(formatter =>
-        formatter.FormatError(nameof(FileLogTest), eStr))
+        formatter.FormatError(nameof(LogTest), eStr))
       .Returns(formattedException);
 
-    var mockWriter = new Mock<FileLog.IWriter>();
-    var log = (ILog)new FileLog(nameof(FileLogTest), mockWriter.Object) {
+    var mockWriter = new Mock<ILogWriter>();
+    var log = (ILog)new Log(nameof(LogTest), [mockWriter.Object]) {
       Formatter = mockFormatter.Object
     };
     log.Print(e, contextMsg);
 
     mockFormatter.Assert(formatter =>
-        formatter.FormatError(nameof(FileLogTest), contextMsg),
+        formatter.FormatError(nameof(LogTest), contextMsg),
       Invoked.Once);
     mockFormatter.Assert(formatter =>
-        formatter.FormatError(nameof(FileLogTest), exceptionMsg),
+        formatter.FormatError(nameof(LogTest), exceptionMsg),
       Invoked.Once);
     mockFormatter.Assert(formatter =>
-        formatter.FormatError(nameof(FileLogTest), eStr),
+        formatter.FormatError(nameof(LogTest), eStr),
       Invoked.Once);
 
     mockWriter.Assert(writer =>
@@ -177,23 +177,22 @@ public class FileLogTest {
 
   [Fact]
   public void PrintsStackTrace() {
-    var expectedStackTraceMsg = "ClassName.MethodName in File.cs(1,2)";
-    var formattedStackTraceMsg = Format(expectedStackTraceMsg);
-
-    var mockFormatter = new Mock<ILogFormatter>();
-    mockFormatter.Arrange(formatter =>
-        formatter.FormatMessage(nameof(FileLogTest), expectedStackTraceMsg))
-      .Returns(formattedStackTraceMsg);
-
-    var mockWriter = new Mock<FileLog.IWriter>();
-    var log = new FileLog(nameof(FileLogTest), mockWriter.Object) {
-      Formatter = mockFormatter.Object
-    };
     var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
+    var formattedStackTraceMsg = Format("ClassName.MethodName in File.cs(1,2)");
+
+    var mockFormatter = new Mock<ILogFormatter>();
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatMessage(nameof(LogTest), st))
+      .Returns(formattedStackTraceMsg);
+
+    var mockWriter = new Mock<ILogWriter>();
+    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
+      Formatter = mockFormatter.Object
+    };
     log.Print(st);
 
     mockFormatter.Assert(formatter =>
-        formatter.FormatMessage(nameof(FileLogTest), expectedStackTraceMsg),
+        formatter.FormatMessage(nameof(LogTest), st),
       Invoked.Once);
 
     mockWriter.Assert(writer =>
@@ -203,81 +202,36 @@ public class FileLogTest {
   }
 
   [Fact]
-  public void PrintsStackTraceWithoutFile() {
-    var expectedStackTraceMsg = "ClassName.MethodName in **(1,2)";
-    var formattedStackTraceMsg = Format(expectedStackTraceMsg);
+  public void PrintsStackTraceWithMessage() {
+    var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
+    var formattedStackTraceMsg = Format("ClassName.MethodName in File.cs(1,2)");
+    var formattedContextMsg = Format(TEST_MSG);
 
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
-        formatter.FormatMessage(nameof(FileLogTest), expectedStackTraceMsg))
+        formatter.FormatMessage(nameof(LogTest), TEST_MSG))
+      .Returns(formattedContextMsg);
+    mockFormatter.Arrange(formatter =>
+        formatter.FormatMessage(nameof(LogTest), st))
       .Returns(formattedStackTraceMsg);
 
-    var mockWriter = new Mock<FileLog.IWriter>();
-    var log = new FileLog(nameof(FileLogTest), mockWriter.Object) {
+    var mockWriter = new Mock<ILogWriter>();
+    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
       Formatter = mockFormatter.Object
     };
-    var st = new FakeStackTrace(null, "ClassName", "MethodName");
-    log.Print(st);
+    log.Print(st, TEST_MSG);
 
     mockFormatter.Assert(formatter =>
-        formatter.FormatMessage(nameof(FileLogTest), expectedStackTraceMsg),
+        formatter.FormatMessage(nameof(LogTest), TEST_MSG),
+      Invoked.Once);
+    mockFormatter.Assert(formatter =>
+        formatter.FormatMessage(nameof(LogTest), st),
       Invoked.Once);
 
     mockWriter.Assert(writer =>
-        writer.WriteMessage(formattedStackTraceMsg),
+        writer.WriteMessage(formattedContextMsg),
       Invoked.Once
     );
-  }
-
-  [Fact]
-  public void PrintsStackTraceWithoutClass() {
-    var expectedStackTraceMsg = "UnknownClass.MethodName in File.cs(1,2)";
-    var formattedStackTraceMsg = Format(expectedStackTraceMsg);
-
-    var mockFormatter = new Mock<ILogFormatter>();
-    mockFormatter.Arrange(formatter =>
-        formatter.FormatMessage(nameof(FileLogTest), expectedStackTraceMsg))
-      .Returns(formattedStackTraceMsg);
-
-    var mockWriter = new Mock<FileLog.IWriter>();
-    var log = new FileLog(nameof(FileLogTest), mockWriter.Object) {
-      Formatter = mockFormatter.Object
-    };
-    var st = new FakeStackTrace("File.cs", null, "MethodName");
-    log.Print(st);
-
-    mockFormatter.Assert(formatter =>
-        formatter.FormatMessage(nameof(FileLogTest), expectedStackTraceMsg),
-      Invoked.Once);
-
-    mockWriter.Assert(writer =>
-        writer.WriteMessage(formattedStackTraceMsg),
-      Invoked.Once
-    );
-  }
-
-  [Fact]
-  public void PrintsStackTraceWithoutMethod() {
-    // unknown method is also unknown class
-    var expectedStackTraceMsg = "UnknownClass.UnknownMethod in File.cs(1,2)";
-    var formattedStackTraceMsg = Format(expectedStackTraceMsg);
-
-    var mockFormatter = new Mock<ILogFormatter>();
-    mockFormatter.Arrange(formatter =>
-        formatter.FormatMessage(nameof(FileLogTest), expectedStackTraceMsg))
-      .Returns(formattedStackTraceMsg);
-
-    var mockWriter = new Mock<FileLog.IWriter>();
-    var log = new FileLog(nameof(FileLogTest), mockWriter.Object) {
-      Formatter = mockFormatter.Object
-    };
-    var st = new FakeStackTrace("File.cs", "ClassName", null);
-    log.Print(st);
-
-    mockFormatter.Assert(formatter =>
-        formatter.FormatMessage(nameof(FileLogTest), expectedStackTraceMsg),
-      Invoked.Once);
-
     mockWriter.Assert(writer =>
         writer.WriteMessage(formattedStackTraceMsg),
       Invoked.Once
