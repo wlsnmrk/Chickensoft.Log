@@ -90,12 +90,13 @@ public class MyClass
 > may not. For instance, the `TraceWriter` has separate channels for regular log
 > messages, warnings, and errors. The `FileWriter` has only one channel, the
 > file it's writing to. Warnings and errors can still be distinguished by the
-> label the formatter gives them.
+> label the formatter gives them, even if directed to the same channel as regular
+> log messages.
 
 ### Formatting
 
 Optionally, when constructing a log, you can provide an `ILogFormatter` that the
-log will use to format each log message. (The formatted message should include
+log will use to format each message. (The formatted message should include
 the log's name, the level of the message, and the message itself.)
 
 ```csharp

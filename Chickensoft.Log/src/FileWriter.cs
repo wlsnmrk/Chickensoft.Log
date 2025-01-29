@@ -19,7 +19,8 @@ public sealed class FileWriter : ILogWriter {
   private static string _defaultFileName = "output.log";
   /// <summary>
   /// The default file name that will be used when creating a
-  /// <see cref="FileWriter"/> if no filename is specified.
+  /// <see cref="FileWriter"/> if no filename is specified. Defaults to
+  /// "output.log".
   /// </summary>
   /// <remarks>
   /// This default may be changed. If it is changed after a default
@@ -89,7 +90,7 @@ public sealed class FileWriter : ILogWriter {
   private readonly object _writingLock = new();
 
   /// <summary>
-  /// The path of the filename this Writer is writing to.
+  /// The path of the file this Writer is writing to.
   /// </summary>
   public string FileName { get; }
 
