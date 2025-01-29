@@ -1,42 +1,18 @@
 namespace Chickensoft.Log;
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 /// <summary>
-/// An <see cref="ILog"/> that writes to standard output and error.
+/// The standard implementation of <see cref="ILog"/>.
 /// </summary>
-public class ConsoleLog : ILog {
-  /// <summary>
-  /// An <see cref="ILogWriter"/> implementing output for <see cref="ConsoleLog"/>.
-  /// </summary>
-  public interface IWriter : ILogWriter;
-
-  /// <summary>
-  /// An <see cref="IWriter"/> that directs output of a <see cref="ConsoleLog"/>
-  /// to the console.
-  /// </summary>
-  public class Writer : IWriter {
-    /// <inheritdoc/>
-    public void WriteError(string message) {
-      Console.Error.WriteLine(message);
-    }
-
-    /// <inheritdoc/>
-    public void WriteMessage(string message) {
-      Console.WriteLine(message);
-    }
-
-    /// <inheritdoc/>
-    public void WriteWarning(string message) {
-      Console.WriteLine(message);
-    }
-  }
-
-  private readonly IWriter _writer;
-
+public sealed class Log : ILog {
   /// <inheritdoc/>
   public string Name { get; }
+
+  /// <inheritdoc/>
+  public IList<ILogWriter> Writers { get; } = [];
 
   /// <summary>
   /// The formatter that will be used to format messages before writing them
@@ -45,43 +21,37 @@ public class ConsoleLog : ILog {
   public ILogFormatter Formatter { get; set; } = new LogFormatter();
 
   /// <summary>
-  /// Create a logger using the given name and standard out/err.
+  /// Initialize an empty Log (i.e., with no writers).
   /// </summary>
   /// <param name="name">
   /// The name associated with this log. Will be included in messages directed
   /// through this log (see <see cref="Name"/>).
   /// A common value is <c>nameof(EncapsulatingClass)</c>.
   /// </param>
-  public ConsoleLog(string name) {
+  public Log(string name) {
     Name = name;
-    _writer = new Writer();
   }
 
   /// <summary>
-  /// Create a logger using the given name and the provided
-  /// <see cref="IWriter"/> for output. Useful for testing.
+  /// Initialize a Log that will use the provided writers.
   /// </summary>
   /// <param name="name">
   /// The name associated with this log. Will be included in messages directed
   /// through this log (see <see cref="Name"/>).
   /// A common value is <c>nameof(EncapsulatingClass)</c>.
   /// </param>
-  /// <param name="writer">
-  /// The writer to use for outputting log messages.
-  /// </param>
-  public ConsoleLog(string name, IWriter writer) {
+  /// <param name="writers">Writers this log will use to write messages.</param>
+  public Log(string name, IList<ILogWriter> writers) {
     Name = name;
-    _writer = writer;
-  }
-
-  /// <inheritdoc/>
-  public void Err(string message) {
-    _writer.WriteError(Formatter.FormatError(Name, message));
+    Writers = [.. writers];
   }
 
   /// <inheritdoc/>
   public void Print(string message) {
-    _writer.WriteMessage(Formatter.FormatMessage(Name, message));
+    var formatted = Formatter.FormatMessage(Name, message);
+    foreach (var writer in Writers) {
+      writer.WriteMessage(formatted);
+    }
   }
 
   /// <inheritdoc/>
@@ -108,6 +78,17 @@ public class ConsoleLog : ILog {
 
   /// <inheritdoc/>
   public void Warn(string message) {
-    _writer.WriteWarning(Formatter.FormatWarning(Name, message));
+    var formatted = Formatter.FormatWarning(Name, message);
+    foreach (var writer in Writers) {
+      writer.WriteWarning(formatted);
+    }
+  }
+
+  /// <inheritdoc/>
+  public void Err(string message) {
+    var formatted = Formatter.FormatError(Name, message);
+    foreach (var writer in Writers) {
+      writer.WriteError(formatted);
+    }
   }
 }

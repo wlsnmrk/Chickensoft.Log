@@ -1,5 +1,7 @@
 namespace Chickensoft.Log;
+
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 /// <summary>
@@ -13,6 +15,11 @@ public interface ILog {
   /// messages from a single log can be identified.
   /// </summary>
   public string Name { get; }
+
+  /// <summary>
+  /// The writers that will receive messages for this log.
+  /// </summary>
+  public IList<ILogWriter> Writers { get; }
 
   /// <summary>
   /// Prints the specified message to the log.
