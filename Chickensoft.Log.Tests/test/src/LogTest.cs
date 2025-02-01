@@ -20,6 +20,14 @@ public class LogTest {
   }
 
   [Fact]
+  public void InitializesWithDefaults() {
+    var mockWriter = new Mock<ILogWriter>();
+    var log = new Log(nameof(LogTest));
+    log.ShouldBeAssignableTo<ILog>();
+    log.Name.ShouldBe(nameof(LogTest));
+  }
+
+  [Fact]
   public void PrintsMessage() {
     var formattedTestMsg = Format(TEST_MSG);
     var mockFormatter = new Mock<ILogFormatter>();
