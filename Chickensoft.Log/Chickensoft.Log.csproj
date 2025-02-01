@@ -13,7 +13,7 @@
     <OutputPath>./nupkg</OutputPath>
     <DebugType>portable</DebugType>
 
-    <Title>Log</Title>
+    <Title>Chickensoft.Log</Title>
     <Version>0.0.0-devbuild</Version>
     <Description>Opinionated logging interface and implementations for C# applications and libraries.</Description>
     <Copyright>© 2025 Chickensoft</Copyright>
