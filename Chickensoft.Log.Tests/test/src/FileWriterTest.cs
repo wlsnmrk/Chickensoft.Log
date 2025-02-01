@@ -58,6 +58,8 @@ public class FileWriterTest {
 
   [Fact]
   public void DefaultInstance() {
+    using var tester = new FileWriterStreamTester();
+
     var writer = FileWriter.Instance();
     writer.ShouldNotBeNull();
     writer.ShouldBeOfType<FileWriter>();
@@ -65,6 +67,8 @@ public class FileWriterTest {
 
   [Fact]
   public void NewInstance() {
+    using var tester = new FileWriterStreamTester();
+
     var filename = "test.log";
     var writer = FileWriter.Instance(filename);
     writer.ShouldNotBeNull();
@@ -73,6 +77,8 @@ public class FileWriterTest {
 
   [Fact]
   public void ReusesInstanceAndRemoves() {
+    using var tester = new FileWriterStreamTester();
+
     var filename = "test.log";
     var writer1 = FileWriter.Instance(filename);
     var writer2 = FileWriter.Instance(filename);
