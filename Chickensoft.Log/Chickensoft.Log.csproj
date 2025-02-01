@@ -13,9 +13,9 @@
     <OutputPath>./nupkg</OutputPath>
     <DebugType>portable</DebugType>
 
-    <Title>Chickensoft.Log</Title>
+    <Title>Log</Title>
     <Version>0.0.0-devbuild</Version>
-    <Description>Chickensoft.Log description.</Description>
+    <Description>Opinionated logging interface and implementations for C# applications and libraries.</Description>
     <Copyright>© 2025 Chickensoft</Copyright>
     <Authors>Chickensoft</Authors>
     <Company>Chickensoft</Company>
@@ -23,13 +23,13 @@
     <PackageId>Chickensoft.Log</PackageId>
     <PackageReleaseNotes>Chickensoft.Log release.</PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageTags />
+    <PackageTags>logging;log;logger;loggers;chickensoft;util;utils</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl></PackageProjectUrl>
 
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl></RepositoryUrl>
+    <RepositoryUrl>https://github.com/chickensoft-games/Log</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

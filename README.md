@@ -1,4 +1,4 @@
-# Chickensoft.Log
+# 🪵 Log
 
 [![Chickensoft Badge][chickensoft-badge]][chickensoft-website]
 [![Discord][discord-badge]][discord]
@@ -15,18 +15,18 @@ and libraries.
 <img alt="Chickensoft.Log" src="Chickensoft.Log/icon.png" width="200">
 </p>
 
-## 🥚 Getting Started
+## 📦 Installation
 
 > [!TIP]
 > For logging in Godot, see [Chickensoft.Log.Godot][log-godot].
 
 Install the latest version of the [Chickensoft.Log] package from nuget:
 
-```xml
-<PackageReference Include="Chickensoft.Log" Version=... />
+```sh
+dotnet add package Chickensoft.Log
 ```
 
-## 🪵 Usage
+## 🌱 Usage
 
 ### Essentials
 
