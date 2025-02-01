@@ -13,7 +13,7 @@ public sealed class Log : ILog {
   /// <inheritdoc/>
   public string Name { get; }
 
-  private readonly List<ILogWriter> _writers = [];
+  internal readonly List<ILogWriter> _writers = [];
 
   /// <summary>
   /// The formatter that will be used to format messages before writing them

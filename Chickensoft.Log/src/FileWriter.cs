@@ -1,22 +1,32 @@
 namespace Chickensoft.Log;
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 /// <summary>
 /// An <see cref="ILogWriter"/> that directs output of an <see cref="ILog"/>
 /// to a file.
 /// </summary>
-[ExcludeFromCodeCoverage(Justification = "File output is untestable")]
 public sealed class FileWriter : ILogWriter {
+  internal delegate StreamWriter AppendTextDelegate(string text);
+  internal static AppendTextDelegate AppendTextDefault { get; } =
+    File.AppendText;
+  internal static AppendTextDelegate AppendText { get; set; } =
+    AppendTextDefault;
+
   // protect static members from simultaneous thread access
   private static readonly object _singletonLock = new();
   // Implemented as a pseudo-singleton to enforce one truncation per file per
   // execution
   private static readonly Dictionary<string, FileWriter> _instances = [];
 
-  private static string _defaultFileName = "output.log";
+  /// <summary>The default filename for logs.</summary>
+  public const string DEFAULT_FILE_NAME = "output.log";
+
+#pragma warning disable IDE0032 // Use auto property
+  private static string _defaultFileName = DEFAULT_FILE_NAME;
+#pragma warning restore IDE0032 // Use auto property
+
   /// <summary>
   /// The default file name that will be used when creating a
   /// <see cref="FileWriter"/> if no filename is specified. Defaults to
@@ -87,6 +97,24 @@ public sealed class FileWriter : ILogWriter {
     }
   }
 
+  /// <summary>
+  /// Remove a <see cref="FileWriter"/> that had previously been created.
+  /// While not necessary, this can free up resources if writing to many
+  /// different log files.
+  /// </summary>
+  /// <param name="fileName">Filename for the log.</param>
+  /// <returns>The file writer, if one existed for the given filename.
+  /// Otherwise, just null.</returns>
+  public static FileWriter? Remove(string fileName) {
+    lock (_singletonLock) {
+      if (_instances.TryGetValue(fileName, out var writer)) {
+        _instances.Remove(fileName);
+        return writer;
+      }
+    }
+    return null;
+  }
+
   private readonly object _writingLock = new();
 
   /// <summary>
@@ -102,14 +130,10 @@ public sealed class FileWriter : ILogWriter {
     }
   }
 
-  [SuppressMessage("Style",
-    "IDE0063:Use simple 'using' statement",
-    Justification = "Prefer block, to explicitly delineate scope")]
   private void WriteLine(string message) {
     lock (_writingLock) {
-      using (var sw = File.AppendText(FileName)) {
-        sw.WriteLine(message);
-      }
+      using var sw = AppendText(FileName);
+      sw.WriteLine(message);
     }
   }
 

@@ -237,4 +237,19 @@ public class LogTest {
       Invoked.Once
     );
   }
+
+  [Fact]
+  public void AddsAndRemovesWriters() {
+    var writerA = new Mock<ILogWriter>();
+    var writerB = new Mock<ILogWriter>();
+    var log = new Log(nameof(LogTest), [writerA.Object]);
+
+    log.AddWriter(writerB.Object);
+
+    log._writers.ShouldBe([writerA.Object, writerB.Object]);
+
+    log.RemoveWriter(writerA.Object);
+
+    log._writers.ShouldBe([writerB.Object]);
+  }
 }
