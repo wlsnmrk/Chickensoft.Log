@@ -8,11 +8,16 @@ using System.IO;
 /// to a file.
 /// </summary>
 public sealed class FileWriter : ILogWriter {
-  internal delegate StreamWriter AppendTextDelegate(string text);
+  internal delegate StreamWriter AppendTextDelegate(string path);
   internal static AppendTextDelegate AppendTextDefault { get; } =
     File.AppendText;
   internal static AppendTextDelegate AppendText { get; set; } =
     AppendTextDefault;
+
+  internal delegate Stream CreateFileDelegate(string path);
+  internal static CreateFileDelegate CreateFileDefault { get; } = File.Create;
+  internal static CreateFileDelegate CreateFile { get; set; } =
+    CreateFileDefault;
 
   // protect static members from simultaneous thread access
   private static readonly object _singletonLock = new();
@@ -126,7 +131,7 @@ public sealed class FileWriter : ILogWriter {
     FileName = fileName;
     lock (_writingLock) {
       // Clear the file
-      using var sw = new StreamWriter(FileName);
+      using var sw = CreateFile(FileName);
     }
   }
 

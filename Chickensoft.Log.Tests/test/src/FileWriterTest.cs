@@ -6,24 +6,28 @@ using Shouldly;
 
 public class FileWriterStreamTester : IDisposable {
   private bool _isDisposed;
-  private readonly MemoryStream _memoryStream;
+  private readonly MemoryStream _openingMemoryStream;
+  private readonly MemoryStream _appendingMemoryStream;
 
   public FileWriterStreamTester(
     string filename = FileWriter.DEFAULT_FILE_NAME
   ) {
-    _memoryStream = new MemoryStream();
+    _openingMemoryStream = new MemoryStream();
+    _appendingMemoryStream = new MemoryStream();
 
     FileWriter.AppendText = fileName => new StreamWriter(
-      _memoryStream,
+      _appendingMemoryStream,
       System.Text.Encoding.UTF8,
       bufferSize: 1024,
       leaveOpen: true
     );
+
+    FileWriter.CreateFile = fileName => _openingMemoryStream;
   }
 
   public string GetString() {
-    _memoryStream.Position = 0;
-    using var reader = new StreamReader(_memoryStream);
+    _appendingMemoryStream.Position = 0;
+    using var reader = new StreamReader(_appendingMemoryStream);
     return reader.ReadToEnd();
   }
 
@@ -34,7 +38,9 @@ public class FileWriterStreamTester : IDisposable {
     _isDisposed = true;
 
     FileWriter.AppendText = FileWriter.AppendTextDefault;
-    _memoryStream.Dispose();
+    FileWriter.CreateFile = FileWriter.CreateFileDefault;
+    _openingMemoryStream.Dispose();
+    _appendingMemoryStream.Dispose();
   }
 }
 
