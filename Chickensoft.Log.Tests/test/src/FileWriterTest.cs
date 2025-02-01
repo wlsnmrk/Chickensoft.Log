@@ -24,8 +24,7 @@ public class FileWriterStreamTester : IDisposable {
   public string GetString() {
     _memoryStream.Position = 0;
     using var reader = new StreamReader(_memoryStream);
-    var result = reader.ReadToEnd();
-    return result;
+    return reader.ReadToEnd();
   }
 
   public void Dispose() {
