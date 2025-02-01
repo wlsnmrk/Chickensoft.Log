@@ -22,7 +22,7 @@ public sealed class Log : ILog {
   public ILogFormatter Formatter { get; set; } = new LogFormatter();
 
   /// <summary>
-  /// Initialize a Log that will use the provided writers.
+  /// Initialize a log that will use the provided writers.
   /// </summary>
   /// <param name="name">
   /// The name associated with this log. Will be included in messages directed
@@ -30,9 +30,22 @@ public sealed class Log : ILog {
   /// A common value is <c>nameof(EncapsulatingClass)</c>.
   /// </param>
   /// <param name="writers">Writers this log will use to write messages.</param>
-  public Log(string name, IList<ILogWriter> writers) {
+  public Log(string name, params ILogWriter[] writers) {
     Name = name;
     _writers = [.. writers];
+  }
+
+  /// <summary>
+  /// Creates a log that will output to trace by default.
+  /// </summary>
+  /// <param name="name">
+  /// The name associated with this log. Will be included in messages directed
+  /// through this log (see <see cref="Name"/>).
+  /// A common value is <c>nameof(EncapsulatingClass)</c>.
+  /// </param>
+  public Log(string name) {
+    Name = name;
+    _writers = [new TraceWriter()];
   }
 
   /// <inheritdoc/>
