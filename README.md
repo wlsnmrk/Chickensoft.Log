@@ -156,6 +156,32 @@ below for details.
 The package provides one additional writer type, `TestWriter`, which may be
 useful for testing your code without mocking `ILog` (see below).
 
+### Using `TraceWriter`
+
+To see `TraceWriter`'s output from a Godot application in Visual Studio's
+Output pane, add a `DefaultTraceListener` to the system's list of `Trace`
+listeners somewhere near your entry point:
+
+```csharp
+using System.Diagnostics;
+
+public class MyGodotApp : Node
+{
+  public override void _Ready()
+  {
+    Trace.Listeners.Add(new DefaultTraceListener());
+  }
+}
+```
+
+This step is necessary with [GoDotTest] test suites as well as games (or any
+other Godot-based applications).
+
+> [!TIP]
+> This step is unnecessary if you are running or debugging in Visual Studio
+> Code, so you may want to guard adding `DefaultTraceListener` with a
+> command-line flag.
+
 ### Using `FileWriter`
 
 `FileWriter` provides two static `Instance()` methods for obtaining references
@@ -267,3 +293,4 @@ public class MyClassTest
 
 [Chickensoft.Log]: https://www.nuget.org/packages/Chickensoft.Log
 [log-godot]: https://github.com/chickensoft-games/Log.Godot
+[GoDotTest]: https://github.com/chickensoft-games/GoDotTest
