@@ -38,15 +38,25 @@ directing log messages to one output.
 ### Setting up a Log
 
 The package includes a standard implementation of `ILog`, named `Log`. To create
-a log, instantiate a `Log` and give it a name and at least one writer.
-
-Example:
+a log, instantiate a `Log` and give it a name and at least one writer:
 
 ```csharp
 public class MyClass
 {
   // Create a log with the name of MyClass, outputting to stdout/stderr
-  private ILog _log = new Log(nameof(MyClass), [new ConsoleWriter()]);
+  private ILog _log = new Log(nameof(MyClass), new ConsoleWriter());
+}
+```
+
+You can give the log multiple writers to obtain multiple outputs:
+
+```csharp
+public class MyClass
+{
+  // Create a log with the name of MyClass, outputting to stdout/stderr and
+  // .NET's Trace system
+  private ILog _log = new Log(nameof(MyClass), new ConsoleWriter(),
+    new TraceWriter());
 }
 ```
 
@@ -102,7 +112,7 @@ the log's name, the level of the message, and the message itself.)
 ```csharp
 public class MyClass
 {
-  private ILog _log = new Log(nameof(MyClass), [new ConsoleWriter()])
+  private ILog _log = new Log(nameof(MyClass), new ConsoleWriter())
   {
     Formatter = new MyFormatter()
   };
@@ -114,7 +124,8 @@ By default, `Log` will use the included `LogFormatter` class implementing
 
 Messages are formatted with one of three level labels, depending which log method
 you call. By default, the included `LogFormatter` uses the labels `"Info"`,
-`"Warn"`, and `"Error"`. You can change these labels for an individual `LogFormatter`:
+`"Warn"`, and `"Error"`. You can change these labels for an individual
+`LogFormatter`:
 
 ```csharp
 var formatter = new LogFormatter()
@@ -139,9 +150,9 @@ LogFormatter.DefaultErrorPrefix = "ERROR";
 
 ## ✒️ Writer Types
 
-`Log` accepts a list of writers, which receive formatted messages from the log
-and are responsible for handling the output of the messages. The Log package
-provides three writer types for use in applications or libraries:
+`Log` accepts a parameter array of writers, which receive formatted messages
+from the log and are responsible for handling the output of the messages. The
+Log package provides three writer types for use in applications or libraries:
 
 * `ConsoleWriter`: Outputs log messages to stdout and stderr.
 * `TraceWriter`: Outputs log messages to .NET's `Trace` system. This is useful
@@ -192,7 +203,7 @@ You can obtain a reference to a writer using the default file name `"output.log"
 ```csharp
 public class MyClass
 {
-  private ILog _log = new Log(nameof(MyClass), [FileWriter.Instance()]);
+  private ILog _log = new Log(nameof(MyClass), FileWriter.Instance());
 }
 ```
 
@@ -202,7 +213,8 @@ You can obtain a writer that outputs messages to a custom file name:
 ```csharp
 public class MyClass
 {
-  private ILog _log = new Log(nameof(MyClass), [FileWriter.Instance("CustomFileName.log")];
+  private ILog _log = new Log(nameof(MyClass),
+    FileWriter.Instance("CustomFileName.log"));
 }
 ```
 
@@ -223,7 +235,7 @@ public class Entry
 public class MyClass
 {
   // Create a FileWriter that writes to the new default name
-  private ILog _log = new Log(nameof(MyClass), [FileWriter.Instance()]);
+  private ILog _log = new Log(nameof(MyClass), FileWriter.Instance());
 }
 ```
 
@@ -241,7 +253,7 @@ which accumulates log messages for testing:
 // Class under test
 public class MyClass
 {
-  public ILog Log { get; set; } = new Log(nameof(MyClass), [new ConsoleWriter()]);
+  public ILog Log { get; set; } = new Log(nameof(MyClass), new ConsoleWriter());
 
   // Method that logs some information; we want to test the logged messages
   public void MyMethod()
@@ -258,7 +270,7 @@ public class MyClassTest
   {
     // set up an instance of MyClass, but with a TestWriter instead of a ConsoleWriter
     var testWriter = new TestWriter();
-    var obj = new MyClass() { Log = new Log(nameof(MyClass), [testWriter]) };
+    var obj = new MyClass() { Log = new Log(nameof(MyClass), testWriter) };
     obj.MyMethod();
     // use TestWriter to test the logging behavior of MyClass
     testWriter.LoggedMessages
