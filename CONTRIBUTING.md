@@ -15,8 +15,6 @@ Please read our [code of conduct](#code-of-conduct). We do our best to treat oth
 
 This is a C# nuget package, for use with the .NET SDK 6 or 7. As such, the `dotnet` tool will allow you to restore packages and build projects.
 
-The `Chickensoft.Log.Tests` project must be built with the Godot editor at least once before `dotnet build` will succeed. Godot has to generate the .NET bindings for the project, since tests run in an actual game environment.
-
 ## Coding Guidelines
 
 Your IDE should automatically adhere to the style guidelines in the provided `.editorconfig` file. Please try to keep lines under 80 characters long whenever possible.
