@@ -1,7 +1,6 @@
 **/coverage/*
 !**/coverage/.gdignore
 nupkg/
-.godot/
 bin/
 obj/
 .generated/
