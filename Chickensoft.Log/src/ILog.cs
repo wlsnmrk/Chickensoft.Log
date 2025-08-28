@@ -53,16 +53,20 @@ public interface ILog {
   public void Print(StackTrace stackTrace, string message);
 
   /// <summary>
-  /// Prints an exception.
+  /// Prints an exception as an error. This method is an alias for
+  /// <see cref="Err(Exception)"/>.
   /// </summary>
   /// <param name="e">Exception to print.</param>
+  /// <seealso cref="Err(Exception)"/>
   public void Print(Exception e);
 
   /// <summary>
-  /// Prints an exception with a message for context.
+  /// Prints an exception as an error, with a message for context. This method
+  /// is an alias for <see cref="Err(Exception, string)"/>.
   /// </summary>
   /// <param name="e">Exception to print.</param>
   /// <param name="message">Message to output.</param>
+  /// <seealso cref="Err(Exception, string)"/>
   public void Print(Exception e, string message);
 
   /// <summary>
@@ -76,4 +80,17 @@ public interface ILog {
   /// </summary>
   /// <param name="message">Message to output.</param>
   public void Err(string message);
+
+  /// <summary>
+  /// Prints an exception as an error.
+  /// </summary>
+  /// <param name="e">Exception to print.</param>
+  public void Err(Exception e);
+
+  /// <summary>
+  /// Prints an exception as an error, with a message for context.
+  /// </summary>
+  /// <param name="e">Exception to print.</param>
+  /// <param name="message">Message to output.</param>
+  public void Err(Exception e, string message);
 }
