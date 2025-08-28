@@ -99,16 +99,14 @@ public sealed class Log : ILog {
   /// <inheritdoc/>
   public void Print(Exception e) {
     lock (_writersLock) {
-      Err("Exception:");
-      Err(e.ToString());
+      Err(e);
     }
   }
 
   /// <inheritdoc/>
   public void Print(Exception e, string message) {
     lock (_writersLock) {
-      Err(message);
-      Print(e);
+      Err(e, message);
     }
   }
 
@@ -129,6 +127,22 @@ public sealed class Log : ILog {
       foreach (var writer in _writers) {
         writer.WriteError(formatted);
       }
+    }
+  }
+
+  /// <inheritdoc/>
+  public void Err(Exception e) {
+    lock (_writersLock) {
+      Err("Exception:");
+      Err(e.ToString());
+    }
+  }
+
+  /// <inheritdoc/>
+  public void Err(Exception e, string message) {
+    lock (_writersLock) {
+      Err(message);
+      Err(e);
     }
   }
 }
