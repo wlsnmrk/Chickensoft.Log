@@ -7,7 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 /// An <see cref="ILogWriter"/> that directs output of an <see cref="ILog"/>
 /// to the console.
 /// </summary>
-[ExcludeFromCodeCoverage(Justification = "Console output is untestable")]
+
+// Excluded from coverage because Console output is untestable
+[ExcludeFromCodeCoverage]
 public sealed class ConsoleWriter : ILogWriter {
   /// <inheritdoc/>
   public void WriteError(string message) {

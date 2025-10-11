@@ -7,7 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 /// An <see cref="ILogWriter"/> that directs output of an <see cref="ILog"/>
 /// to <see cref="Trace"/>.
 /// </summary>
-[ExcludeFromCodeCoverage(Justification = "Trace output is untestable")]
+
+// Excluded from coverage because Trace output is untestable
+[ExcludeFromCodeCoverage]
 public sealed class TraceWriter : ILogWriter {
   /// <inheritdoc/>
   public void WriteMessage(string message) {
