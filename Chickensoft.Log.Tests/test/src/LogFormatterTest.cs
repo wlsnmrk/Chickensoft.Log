@@ -2,7 +2,8 @@ namespace Chickensoft.Log.Tests;
 
 using Shouldly;
 
-public class LogFormatterTest {
+public class LogFormatterTest
+{
   private readonly string _testMsg = "A test message";
   private readonly string _testName = "TestName";
   private readonly string _testMessagePrefix = "INFO";
@@ -10,20 +11,23 @@ public class LogFormatterTest {
   private readonly string _testErrorPrefix = "ERROR";
 
   [Fact]
-  public void IsILogFormatter() {
+  public void IsILogFormatter()
+  {
     var formatter = new LogFormatter();
     formatter.ShouldBeAssignableTo<ILogFormatter>();
   }
 
   [Fact]
-  public void FormatsMessage() {
+  public void FormatsMessage()
+  {
     var formatter = new LogFormatter();
     formatter.FormatMessage(_testName, _testMsg)
       .ShouldBe($"Info ({_testName}): {_testMsg}");
   }
 
   [Fact]
-  public void FormatsStackTrace() {
+  public void FormatsStackTrace()
+  {
     var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
     var formatter = new LogFormatter();
     formatter.FormatMessage(_testName, st)
@@ -31,7 +35,8 @@ public class LogFormatterTest {
   }
 
   [Fact]
-  public void FormatsStackTraceWithoutFile() {
+  public void FormatsStackTraceWithoutFile()
+  {
     var st = new FakeStackTrace(null, "ClassName", "MethodName");
     var formatter = new LogFormatter();
     formatter.FormatMessage(_testName, st)
@@ -39,7 +44,8 @@ public class LogFormatterTest {
   }
 
   [Fact]
-  public void FormatsStackTraceWithoutClass() {
+  public void FormatsStackTraceWithoutClass()
+  {
     var st = new FakeStackTrace("File.cs", null, "MethodName");
     var formatter = new LogFormatter();
     formatter.FormatMessage(_testName, st)
@@ -47,7 +53,8 @@ public class LogFormatterTest {
   }
 
   [Fact]
-  public void FormatsStackTraceWithoutMethod() {
+  public void FormatsStackTraceWithoutMethod()
+  {
     var st = new FakeStackTrace("File.cs", "ClassName", null);
     var formatter = new LogFormatter();
     // unknown method is also unknown class
@@ -56,22 +63,26 @@ public class LogFormatterTest {
   }
 
   [Fact]
-  public void FormatsWarning() {
+  public void FormatsWarning()
+  {
     var formatter = new LogFormatter();
     formatter.FormatWarning(_testName, _testMsg)
       .ShouldBe($"Warn ({_testName}): {_testMsg}");
   }
 
   [Fact]
-  public void FormatsError() {
+  public void FormatsError()
+  {
     var formatter = new LogFormatter();
     formatter.FormatError(_testName, _testMsg)
       .ShouldBe($"Error ({_testName}): {_testMsg}");
   }
 
   [Fact]
-  public void ChangesMessagePrefix() {
-    var formatter = new LogFormatter {
+  public void ChangesMessagePrefix()
+  {
+    var formatter = new LogFormatter
+    {
       MessagePrefix = _testMessagePrefix
     };
     formatter.FormatMessage(_testName, _testMsg)
@@ -79,8 +90,10 @@ public class LogFormatterTest {
   }
 
   [Fact]
-  public void ChangesWarningPrefix() {
-    var formatter = new LogFormatter {
+  public void ChangesWarningPrefix()
+  {
+    var formatter = new LogFormatter
+    {
       WarningPrefix = _testWarningPrefix
     };
     formatter.FormatWarning(_testName, _testMsg)
@@ -88,8 +101,10 @@ public class LogFormatterTest {
   }
 
   [Fact]
-  public void ChangesErrorPrefix() {
-    var formatter = new LogFormatter {
+  public void ChangesErrorPrefix()
+  {
+    var formatter = new LogFormatter
+    {
       ErrorPrefix = _testErrorPrefix
     };
     formatter.FormatError(_testName, _testMsg)
@@ -97,7 +112,8 @@ public class LogFormatterTest {
   }
 
   [Fact]
-  public void ChangesDefaultMessagePrefix() {
+  public void ChangesDefaultMessagePrefix()
+  {
     var originalDefault = LogFormatter.DefaultMessagePrefix;
     LogFormatter.DefaultMessagePrefix = _testMessagePrefix;
     var formatter = new LogFormatter();
@@ -107,7 +123,8 @@ public class LogFormatterTest {
   }
 
   [Fact]
-  public void ChangesDefaultWarningPrefix() {
+  public void ChangesDefaultWarningPrefix()
+  {
     var originalDefault = LogFormatter.DefaultWarningPrefix;
     LogFormatter.DefaultWarningPrefix = _testWarningPrefix;
     var formatter = new LogFormatter();
@@ -117,7 +134,8 @@ public class LogFormatterTest {
   }
 
   [Fact]
-  public void ChangesDefaultErrorPrefix() {
+  public void ChangesDefaultErrorPrefix()
+  {
     var originalDefault = LogFormatter.DefaultErrorPrefix;
     LogFormatter.DefaultErrorPrefix = _testErrorPrefix;
     var formatter = new LogFormatter();

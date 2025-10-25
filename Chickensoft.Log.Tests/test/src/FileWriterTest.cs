@@ -4,14 +4,16 @@ using System;
 using System.IO;
 using Shouldly;
 
-public class FileWriterStreamTester : IDisposable {
+public class FileWriterStreamTester : IDisposable
+{
   private bool _isDisposed;
   private readonly MemoryStream _openingMemoryStream;
   private readonly MemoryStream _appendingMemoryStream;
 
   public FileWriterStreamTester(
     string filename = FileWriter.DEFAULT_FILE_NAME
-  ) {
+  )
+  {
     _openingMemoryStream = new MemoryStream();
     _appendingMemoryStream = new MemoryStream();
 
@@ -25,14 +27,17 @@ public class FileWriterStreamTester : IDisposable {
     FileWriter.CreateFile = fileName => _openingMemoryStream;
   }
 
-  public string GetString() {
+  public string GetString()
+  {
     _appendingMemoryStream.Position = 0;
     using var reader = new StreamReader(_appendingMemoryStream);
     return reader.ReadToEnd();
   }
 
-  public void Dispose() {
-    if (_isDisposed) { return; }
+  public void Dispose()
+  {
+    if (_isDisposed)
+    { return; }
 
     GC.SuppressFinalize(this);
     _isDisposed = true;
@@ -44,9 +49,11 @@ public class FileWriterStreamTester : IDisposable {
   }
 }
 
-public class FileWriterTest {
+public class FileWriterTest
+{
   [Fact]
-  public void DefaultFileName() {
+  public void DefaultFileName()
+  {
     FileWriter.DefaultFileName.ShouldBe(FileWriter.DEFAULT_FILE_NAME);
 
     var filename = "test.log";
@@ -57,7 +64,8 @@ public class FileWriterTest {
   }
 
   [Fact]
-  public void DefaultInstance() {
+  public void DefaultInstance()
+  {
     using var tester = new FileWriterStreamTester();
 
     var writer = FileWriter.Instance();
@@ -66,7 +74,8 @@ public class FileWriterTest {
   }
 
   [Fact]
-  public void NewInstance() {
+  public void NewInstance()
+  {
     using var tester = new FileWriterStreamTester();
 
     var filename = "test.log";
@@ -76,7 +85,8 @@ public class FileWriterTest {
   }
 
   [Fact]
-  public void ReusesInstanceAndRemoves() {
+  public void ReusesInstanceAndRemoves()
+  {
     using var tester = new FileWriterStreamTester();
 
     var filename = "test.log";
@@ -89,7 +99,8 @@ public class FileWriterTest {
   }
 
   [Fact]
-  public void WriteMessage() {
+  public void WriteMessage()
+  {
     using var tester = new FileWriterStreamTester();
 
     var writer = FileWriter.Instance();
@@ -101,7 +112,8 @@ public class FileWriterTest {
   }
 
   [Fact]
-  public void WriteWarning() {
+  public void WriteWarning()
+  {
     using var tester = new FileWriterStreamTester();
 
     var writer = FileWriter.Instance();
@@ -113,7 +125,8 @@ public class FileWriterTest {
   }
 
   [Fact]
-  public void WriteError() {
+  public void WriteError()
+  {
     using var tester = new FileWriterStreamTester();
 
     var writer = FileWriter.Instance();

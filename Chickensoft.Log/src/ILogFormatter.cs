@@ -5,7 +5,8 @@ using System.Diagnostics;
 /// <summary>
 /// Optional interface providing log-message formatting to <see cref="ILog"/>.
 /// </summary>
-public interface ILogFormatter {
+public interface ILogFormatter
+{
   /// <summary>
   /// Formats a standard informational log message.
   /// </summary>
@@ -17,7 +18,7 @@ public interface ILogFormatter {
   /// A formatted version of the message including the log name and
   /// the log level.
   /// </returns>
-  public string FormatMessage(string logName, string message);
+  string FormatMessage(string logName, string message);
 
   /// <summary>
   /// Formats a single, multi-line informational log message for a stack trace.
@@ -30,7 +31,7 @@ public interface ILogFormatter {
   /// A formatted version of the stack trace including the log name and
   /// the log level on each line.
   /// </returns>
-  public string FormatMessage(string logName, StackTrace stackTrace);
+  string FormatMessage(string logName, StackTrace stackTrace);
 
   /// <summary>
   /// Formats a warning message.
@@ -44,7 +45,7 @@ public interface ILogFormatter {
   /// A formatted version of the message including the log name and
   /// the log level.
   /// </returns>
-  public string FormatWarning(string logName, string message);
+  string FormatWarning(string logName, string message);
 
   /// <summary>
   /// Formats a warning message.
@@ -58,5 +59,5 @@ public interface ILogFormatter {
   /// A formatted version of the message including the log name and
   /// the log level.
   /// </returns>
-  public string FormatError(string logName, string message);
+  string FormatError(string logName, string message);
 }

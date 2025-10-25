@@ -4,15 +4,16 @@ using LightMock;
 using LightMock.Generator;
 using Shouldly;
 
-public class LogTest {
+public class LogTest
+{
   private const string TEST_MSG = "A test message";
 
-  private static string Format(string msg) {
-    return $"MockLevel ({nameof(LogTest)}): {msg}";
-  }
+  private static string Format(string msg)
+    => $"MockLevel ({nameof(LogTest)}): {msg}";
 
   [Fact]
-  public void Initializes() {
+  public void Initializes()
+  {
     var mockWriter = new Mock<ILogWriter>();
     var log = new Log(nameof(LogTest), [mockWriter.Object]);
     log.ShouldBeAssignableTo<ILog>();
@@ -20,7 +21,8 @@ public class LogTest {
   }
 
   [Fact]
-  public void InitializesWithDefaults() {
+  public void InitializesWithDefaults()
+  {
     var mockWriter = new Mock<ILogWriter>();
     var log = new Log(nameof(LogTest));
     log.ShouldBeAssignableTo<ILog>();
@@ -28,7 +30,8 @@ public class LogTest {
   }
 
   [Fact]
-  public void WritesPrintMessage() {
+  public void WritesPrintMessage()
+  {
     var formattedTestMsg = Format(TEST_MSG);
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
@@ -36,7 +39,8 @@ public class LogTest {
       .Returns(formattedTestMsg);
 
     var mockWriter = new Mock<ILogWriter>();
-    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
+    var log = new Log(nameof(LogTest), [mockWriter.Object])
+    {
       Formatter = mockFormatter.Object
     };
     log.Print(TEST_MSG);
@@ -51,7 +55,8 @@ public class LogTest {
   }
 
   [Fact]
-  public void WritesErrorMessage() {
+  public void WritesErrorMessage()
+  {
     var formattedTestMsg = Format(TEST_MSG);
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
@@ -59,7 +64,8 @@ public class LogTest {
       .Returns(formattedTestMsg);
 
     var mockWriter = new Mock<ILogWriter>();
-    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
+    var log = new Log(nameof(LogTest), [mockWriter.Object])
+    {
       Formatter = mockFormatter.Object
     };
     log.Err(TEST_MSG);
@@ -74,7 +80,8 @@ public class LogTest {
   }
 
   [Fact]
-  public void WritesWarningMessage() {
+  public void WritesWarningMessage()
+  {
     var formattedTestMsg = Format(TEST_MSG);
     var mockFormatter = new Mock<ILogFormatter>();
     mockFormatter.Arrange(formatter =>
@@ -82,7 +89,8 @@ public class LogTest {
       .Returns(formattedTestMsg);
 
     var mockWriter = new Mock<ILogWriter>();
-    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
+    var log = new Log(nameof(LogTest), [mockWriter.Object])
+    {
       Formatter = mockFormatter.Object
     };
     log.Warn(TEST_MSG);
@@ -97,7 +105,8 @@ public class LogTest {
   }
 
   [Fact]
-  public void WritesExceptionError() {
+  public void WritesExceptionError()
+  {
     var e = new TestException(TEST_MSG);
     var eMsg = e.ToString();
     var formattedExceptionMsg = Format("Exception:");
@@ -112,7 +121,8 @@ public class LogTest {
       .Returns(formattedException);
 
     var mockWriter = new Mock<ILogWriter>();
-    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
+    var log = new Log(nameof(LogTest), [mockWriter.Object])
+    {
       Formatter = mockFormatter.Object
     };
     log.Err(e);
@@ -139,7 +149,8 @@ public class LogTest {
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style",
     "CA1859:Change type of variable for performance",
     Justification = "Need ILog type to test interface method")]
-  public void WritesExceptionWithMessageError() {
+  public void WritesExceptionWithMessageError()
+  {
     var contextMsg = "Context message";
     var exceptionMsg = "Exception:";
     var e = new TestException(TEST_MSG);
@@ -160,7 +171,8 @@ public class LogTest {
       .Returns(formattedException);
 
     var mockWriter = new Mock<ILogWriter>();
-    var log = (ILog)new Log(nameof(LogTest), [mockWriter.Object]) {
+    var log = (ILog)new Log(nameof(LogTest), [mockWriter.Object])
+    {
       Formatter = mockFormatter.Object
     };
     log.Err(e, contextMsg);
@@ -187,7 +199,8 @@ public class LogTest {
   }
 
   [Fact]
-  public void WritesExceptionPrintAsError() {
+  public void WritesExceptionPrintAsError()
+  {
     var e = new TestException(TEST_MSG);
     var eMsg = e.ToString();
     var formattedExceptionMsg = Format("Exception:");
@@ -202,7 +215,8 @@ public class LogTest {
       .Returns(formattedException);
 
     var mockWriter = new Mock<ILogWriter>();
-    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
+    var log = new Log(nameof(LogTest), [mockWriter.Object])
+    {
       Formatter = mockFormatter.Object
     };
     log.Print(e);
@@ -229,7 +243,8 @@ public class LogTest {
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Style",
     "CA1859:Change type of variable for performance",
     Justification = "Need ILog type to test interface method")]
-  public void WritesExceptionWithMessagePrintAsError() {
+  public void WritesExceptionWithMessagePrintAsError()
+  {
     var contextMsg = "Context message";
     var exceptionMsg = "Exception:";
     var e = new TestException(TEST_MSG);
@@ -250,7 +265,8 @@ public class LogTest {
       .Returns(formattedException);
 
     var mockWriter = new Mock<ILogWriter>();
-    var log = (ILog)new Log(nameof(LogTest), [mockWriter.Object]) {
+    var log = (ILog)new Log(nameof(LogTest), [mockWriter.Object])
+    {
       Formatter = mockFormatter.Object
     };
     log.Print(e, contextMsg);
@@ -277,7 +293,8 @@ public class LogTest {
   }
 
   [Fact]
-  public void WritesStackTrace() {
+  public void WritesStackTrace()
+  {
     var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
     var formattedStackTraceMsg = Format("ClassName.MethodName in File.cs(1,2)");
 
@@ -287,7 +304,8 @@ public class LogTest {
       .Returns(formattedStackTraceMsg);
 
     var mockWriter = new Mock<ILogWriter>();
-    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
+    var log = new Log(nameof(LogTest), [mockWriter.Object])
+    {
       Formatter = mockFormatter.Object
     };
     log.Print(st);
@@ -303,7 +321,8 @@ public class LogTest {
   }
 
   [Fact]
-  public void WritesStackTraceWithMessage() {
+  public void WritesStackTraceWithMessage()
+  {
     var st = new FakeStackTrace("File.cs", "ClassName", "MethodName");
     var formattedStackTraceMsg = Format("ClassName.MethodName in File.cs(1,2)");
     var formattedContextMsg = Format(TEST_MSG);
@@ -317,7 +336,8 @@ public class LogTest {
       .Returns(formattedStackTraceMsg);
 
     var mockWriter = new Mock<ILogWriter>();
-    var log = new Log(nameof(LogTest), [mockWriter.Object]) {
+    var log = new Log(nameof(LogTest), [mockWriter.Object])
+    {
       Formatter = mockFormatter.Object
     };
     log.Print(st, TEST_MSG);
@@ -340,7 +360,8 @@ public class LogTest {
   }
 
   [Fact]
-  public void AddsAndRemovesWriters() {
+  public void AddsAndRemovesWriters()
+  {
     var writerA = new Mock<ILogWriter>();
     var writerB = new Mock<ILogWriter>();
     var log = new Log(nameof(LogTest), [writerA.Object]);

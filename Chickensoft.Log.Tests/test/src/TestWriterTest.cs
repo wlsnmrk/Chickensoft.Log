@@ -3,12 +3,14 @@ namespace Chickensoft.Log.Tests;
 using System.Collections.Generic;
 using Shouldly;
 
-public class TestWriterTest {
+public class TestWriterTest
+{
   private const string TEST_MSG1 = "A test message 1";
   private const string TEST_MSG2 = "A test message 2";
 
   [Fact]
-  public void WriteMessageStoresMessage() {
+  public void WriteMessageStoresMessage()
+  {
     var writer = new TestWriter();
     writer.WriteMessage(TEST_MSG1);
     writer.WriteMessage(TEST_MSG2);
@@ -19,7 +21,8 @@ public class TestWriterTest {
   }
 
   [Fact]
-  public void WriteWarningStoresWarning() {
+  public void WriteWarningStoresWarning()
+  {
     var writer = new TestWriter();
     writer.WriteWarning(TEST_MSG1);
     writer.WriteWarning(TEST_MSG2);
@@ -30,7 +33,8 @@ public class TestWriterTest {
   }
 
   [Fact]
-  public void WriteErrorStoresMessage() {
+  public void WriteErrorStoresMessage()
+  {
     var writer = new TestWriter();
     writer.WriteError(TEST_MSG1);
     writer.WriteError(TEST_MSG2);
@@ -41,7 +45,8 @@ public class TestWriterTest {
   }
 
   [Fact]
-  public void ResetClearsAllStored() {
+  public void ResetClearsAllStored()
+  {
     var writer = new TestWriter();
     writer.WriteMessage(TEST_MSG1);
     writer.WriteMessage(TEST_MSG2);
