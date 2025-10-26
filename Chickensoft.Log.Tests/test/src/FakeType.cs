@@ -4,10 +4,12 @@ using System;
 using System.Globalization;
 using System.Reflection;
 
-internal sealed class FakeType : Type {
+internal sealed class FakeType : Type
+{
   private readonly string? _className;
 
-  public FakeType(string? className) {
+  public FakeType(string? className)
+  {
     _className = className;
   }
 

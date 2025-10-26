@@ -13,7 +13,8 @@ using System.Text;
 /// <item>MESSAGE is the text of the log message</item>
 /// </list>
 /// </summary>
-public class LogFormatter : ILogFormatter {
+public class LogFormatter : ILogFormatter
+{
   /// <summary>
   /// The default level string for ordinary log messages. Defaults to "Info".
   /// </summary>
@@ -62,19 +63,19 @@ public class LogFormatter : ILogFormatter {
   /// </summary>
   public string ErrorPrefix { get; set; } = DefaultErrorPrefix;
 
-  private static string Format(string level, string logName, string message) {
-    return $"{level} ({logName}): {message}";
-  }
+  private static string Format(string level, string logName, string message)
+    => $"{level} ({logName}): {message}";
 
   /// <inheritdoc/>
-  public string FormatMessage(string logName, string message) {
-    return Format(MessagePrefix, logName, message);
-  }
+  public string FormatMessage(string logName, string message)
+    => Format(MessagePrefix, logName, message);
 
   /// <inheritdoc/>
-  public string FormatMessage(string logName, StackTrace stackTrace) {
+  public string FormatMessage(string logName, StackTrace stackTrace)
+  {
     var sb = new StringBuilder();
-    foreach (var frame in stackTrace.GetFrames()) {
+    foreach (var frame in stackTrace.GetFrames())
+    {
       var fileName = frame.GetFileName() ?? "**";
       var lineNumber = frame.GetFileLineNumber();
       var colNumber = frame.GetFileColumnNumber();
@@ -90,12 +91,10 @@ public class LogFormatter : ILogFormatter {
   }
 
   /// <inheritdoc/>
-  public string FormatWarning(string logName, string message) {
-    return Format(WarningPrefix, logName, message);
-  }
+  public string FormatWarning(string logName, string message)
+    => Format(WarningPrefix, logName, message);
 
   /// <inheritdoc/>
-  public string FormatError(string logName, string message) {
-    return Format(ErrorPrefix, logName, message);
-  }
+  public string FormatError(string logName, string message)
+    => Format(ErrorPrefix, logName, message);
 }

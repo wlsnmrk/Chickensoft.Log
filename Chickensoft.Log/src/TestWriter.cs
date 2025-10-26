@@ -7,7 +7,8 @@ using System.Collections.Generic;
 /// them to any destination. Useful for testing code that uses
 /// <see cref="ILog"/>.
 /// </summary>
-public sealed class TestWriter : ILogWriter {
+public sealed class TestWriter : ILogWriter
+{
   /// <summary>
   /// Contains all regular logged messages as separate elements.
   /// </summary>
@@ -24,24 +25,19 @@ public sealed class TestWriter : ILogWriter {
   /// <summary>
   /// Clears all stored messages, of every level.
   /// </summary>
-  public void Reset() {
+  public void Reset()
+  {
     LoggedMessages.Clear();
     LoggedWarnings.Clear();
     LoggedErrors.Clear();
   }
 
   /// <inheritdoc/>
-  public void WriteError(string message) {
-    LoggedErrors.Add(message);
-  }
+  public void WriteError(string message) => LoggedErrors.Add(message);
 
   /// <inheritdoc/>
-  public void WriteMessage(string message) {
-    LoggedMessages.Add(message);
-  }
+  public void WriteMessage(string message) => LoggedMessages.Add(message);
 
   /// <inheritdoc/>
-  public void WriteWarning(string message) {
-    LoggedWarnings.Add(message);
-  }
+  public void WriteWarning(string message) => LoggedWarnings.Add(message);
 }

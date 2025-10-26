@@ -4,7 +4,8 @@ using System;
 using System.Globalization;
 using System.Reflection;
 
-internal sealed class FakeMethodBase : MethodBase {
+internal sealed class FakeMethodBase : MethodBase
+{
 #pragma warning disable IDE0052
   private readonly string? _fileName;
 #pragma warning restore IDE0052
@@ -13,7 +14,8 @@ internal sealed class FakeMethodBase : MethodBase {
 
   public FakeMethodBase(
     string? fileName, string? className, string? methodName
-  ) {
+  )
+  {
     _fileName = fileName;
     _methodName = methodName;
     _className = className;

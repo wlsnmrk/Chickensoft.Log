@@ -10,19 +10,14 @@ using System.Diagnostics.CodeAnalysis;
 
 // Excluded from coverage because Trace output is untestable
 [ExcludeFromCodeCoverage]
-public sealed class TraceWriter : ILogWriter {
+public sealed class TraceWriter : ILogWriter
+{
   /// <inheritdoc/>
-  public void WriteMessage(string message) {
-    Trace.WriteLine(message);
-  }
+  public void WriteMessage(string message) => Trace.WriteLine(message);
 
   /// <inheritdoc/>
-  public void WriteError(string message) {
-    Trace.TraceError(message);
-  }
+  public void WriteError(string message) => Trace.TraceError(message);
 
   /// <inheritdoc/>
-  public void WriteWarning(string message) {
-    Trace.TraceWarning(message);
-  }
+  public void WriteWarning(string message) => Trace.TraceWarning(message);
 }

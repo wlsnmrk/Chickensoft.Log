@@ -7,7 +7,8 @@ using System.IO;
 /// An <see cref="ILogWriter"/> that directs output of an <see cref="ILog"/>
 /// to a file.
 /// </summary>
-public sealed class FileWriter : ILogWriter {
+public sealed class FileWriter : ILogWriter
+{
   internal delegate StreamWriter AppendTextDelegate(string path);
   internal static AppendTextDelegate AppendTextDefault { get; } =
     File.AppendText;
@@ -44,14 +45,19 @@ public sealed class FileWriter : ILogWriter {
   /// outputting to the new default, but previously-created instances will not
   /// be changed and will continue outputting to the original default file.
   /// </remarks>
-  public static string DefaultFileName {
-    get {
-      lock (_singletonLock) {
+  public static string DefaultFileName
+  {
+    get
+    {
+      lock (_singletonLock)
+      {
         return _defaultFileName;
       }
     }
-    set {
-      lock (_singletonLock) {
+    set
+    {
+      lock (_singletonLock)
+      {
         _defaultFileName = value;
       }
     }
@@ -75,9 +81,12 @@ public sealed class FileWriter : ILogWriter {
   /// <paramref name="fileName"/> already exists, it will erased; if not, it
   /// will be created.
   /// </remarks>
-  public static FileWriter Instance(string fileName) {
-    lock (_singletonLock) {
-      if (_instances.TryGetValue(fileName, out var writer)) {
+  public static FileWriter Instance(string fileName)
+  {
+    lock (_singletonLock)
+    {
+      if (_instances.TryGetValue(fileName, out var writer))
+      {
         return writer;
       }
       writer = new FileWriter(fileName);
@@ -96,8 +105,10 @@ public sealed class FileWriter : ILogWriter {
   /// </returns>
   /// <seealso cref="Instance(string)"/>
   /// <seealso cref="DefaultFileName"/>
-  public static FileWriter Instance() {
-    lock (_singletonLock) {
+  public static FileWriter Instance()
+  {
+    lock (_singletonLock)
+    {
       return Instance(DefaultFileName);
     }
   }
@@ -110,9 +121,12 @@ public sealed class FileWriter : ILogWriter {
   /// <param name="fileName">Filename for the log.</param>
   /// <returns>The file writer, if one existed for the given filename.
   /// Otherwise, just null.</returns>
-  public static FileWriter? Remove(string fileName) {
-    lock (_singletonLock) {
-      if (_instances.TryGetValue(fileName, out var writer)) {
+  public static FileWriter? Remove(string fileName)
+  {
+    lock (_singletonLock)
+    {
+      if (_instances.TryGetValue(fileName, out var writer))
+      {
         _instances.Remove(fileName);
         return writer;
       }
@@ -127,33 +141,31 @@ public sealed class FileWriter : ILogWriter {
   /// </summary>
   public string FileName { get; }
 
-  private FileWriter(string fileName) {
+  private FileWriter(string fileName)
+  {
     FileName = fileName;
-    lock (_writingLock) {
+    lock (_writingLock)
+    {
       // Clear the file
       using var sw = CreateFile(FileName);
     }
   }
 
-  private void WriteLine(string message) {
-    lock (_writingLock) {
+  private void WriteLine(string message)
+  {
+    lock (_writingLock)
+    {
       using var sw = AppendText(FileName);
       sw.WriteLine(message);
     }
   }
 
   /// <inheritdoc/>
-  public void WriteMessage(string message) {
-    WriteLine(message);
-  }
+  public void WriteMessage(string message) => WriteLine(message);
 
   /// <inheritdoc/>
-  public void WriteWarning(string message) {
-    WriteLine(message);
-  }
+  public void WriteWarning(string message) => WriteLine(message);
 
   /// <inheritdoc/>
-  public void WriteError(string message) {
-    WriteLine(message);
-  }
+  public void WriteError(string message) => WriteLine(message);
 }
